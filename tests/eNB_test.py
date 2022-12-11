@@ -19,7 +19,7 @@ for i in range(-110, 0, 5):
 def get_line_color(bs_type):
     if bs_type == "lte":
         return "orange"
-    elif bs_type == "nr":
+    if bs_type == "nr":
         return "deepskyblue"
 
 
