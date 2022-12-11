@@ -1,74 +1,54 @@
 import math
 import random
+
 import environment
+from utils import freq_to_wavelength
+
 
 class eNB:
     """
     This class defines properties of a base station.
-    It has a location, type
+    It has a location, id, type and wavelength.
     """
-    
-    def __init__(self, x, type):
+
+    def __init__(self, x, bs_type):
         self.id = random.randint(0, 1000)
         self.location = x
-        self.type = type # "nr" or "lte"
-        if self.type == "nr":
-            self.wavelength = self.freq_to_wavelength(environment.FREQ_NR)
-        elif self.type == "lte":
-            self.wavelength = self.freq_to_wavelength(environment.FREQ_LTE)
-        
+        self.bs_type = bs_type  # "nr" or "lte"
+        if self.bs_type == "nr":
+            self.wavelength = freq_to_wavelength(environment.FREQ_NR)
+        elif self.bs_type == "lte":
+            self.wavelength = freq_to_wavelength(environment.FREQ_LTE)
+
     def __str__(self):
-        return "eNB located at %s of type: %s" % (self.location, self.type)
-    
+        return "eNB located at %s of type: %s" % (self.location, self.bs_type)
+
     def get_location(self):
         return self.location
-    
+
+    def get_id(self):
+        return self.id
+
     def get_type(self):
-        return self.type
-    
+        return self.bs_type
+
     def set_location(self, x):
         self.location = x
-        
-    def set_type(self, type):
-        self.type = type
-        
-    def freq_to_wavelength(self, frequency):
+
+    def calc_RSS(self, ueLocation):
         """
-        This function converts frequency provided in MHz to wavelength in meters
+        This function calculates the Received Signal Strength of the base station in dB
+        This value is calculated using the Friis equation, i.e. RSS = Ptx - Gtx - Grx - L
+        :param ueLocation: Location of the UE
+        :return: RSS in dB
+
+        Here it is assumed that Gtx = Grx = 0 dB
         """
-        wavelength = 3e8 / (frequency * 1e6)
-        return wavelength        
-    
-    # TODO: Clarify RSS and received power from Shankar Sir
-    
-    def calc_received_power(self, distance):
-        """
-        This function calculates the power of the base station
-        """
-        path_loss =  (20 * math.log10(4 * math.pi * math.fabs(self.location - distance) / self.wavelength)) +30
-        received_power = 46 - path_loss # 46 dBm is a common transmit power of the base station
-        return received_power
-    
+        if self.location != ueLocation:
 
-p = eNB(0, "lte")
-q = eNB(0, "nr")
+            rss = 46 - (
+                    20 * math.log10(4 * math.pi * math.fabs(self.location - ueLocation) / self.wavelength))
+        else:
+            rss = 0
 
-print(p.calc_received_power(1))
-print(q.calc_received_power(1))
-
-# Use matplotlib to plot the received power of the base station 
-# as a function of distance from the base station
-
-import matplotlib.pyplot as plt
-import numpy as np
-
-x = [i for i in range(1, 2000)]
-y1 = [p.calc_received_power(i) for i in x]
-y2 = [q.calc_received_power(i) for i in x]
-
-plt.plot(x, y1, label = "LTE")
-plt.plot(x, y2, label = "NR")
-plt.xlabel("Distance from eNB")
-plt.ylabel("Received power")
-plt.legend()
-plt.show()
+        return rss
