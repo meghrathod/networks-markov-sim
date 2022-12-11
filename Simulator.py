@@ -5,9 +5,7 @@ seed(42)
 
 
 class Simulator:
-    """
-    This class defines an environment for the simulator
-    """
+    """This class defines an environment for the simulator"""
 
     def __init__(self, e_nbs, UEs):
         self.e_nbs = e_nbs

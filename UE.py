@@ -4,9 +4,7 @@ import environment
 
 
 class UE:
-    """
-    Defines user entity in the environment
-    """
+    """Defines user entity in the environment"""
 
     velocity = environment.VELOCITY
     direction = 1  # 0 - Towards 0, 1 - Away from
