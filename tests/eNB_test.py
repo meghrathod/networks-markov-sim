@@ -7,11 +7,11 @@ from environment import eNBs
 # Use matplotlib to plot the received power of the base station
 # as a function of distance from the base station
 
-x = [i for i in range(1, 50000)]
+x = list(range(1, 50000))
 
 # Add y-axis labels at increments of 5
 # add guidelines at increments of 5
-plt.yticks([i for i in range(-110, 0, 5)])
+plt.yticks(list(range(-110, 0, 5)))
 for i in range(-110, 0, 5):
     plt.axhline(y=i, color="lightgrey", linestyle="-")
 
