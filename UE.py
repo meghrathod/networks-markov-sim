@@ -53,13 +53,13 @@ class UE:
             self.x = self.x - self.velocity / 1000
 
     def generate_random_motion(self, constant):
-        if constant == 'v':
+        if constant == "v":
             self.set_direction(random.randint(0, 1))
             self.move()
-        if constant == 'd':
+        if constant == "d":
             self.set_velocity(random.randint(0, 100))
             self.move()
-        if constant == 'vd':
+        if constant == "vd":
             self.move()
 
     def getRSSI(self, bs):

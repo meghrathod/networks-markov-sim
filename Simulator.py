@@ -41,11 +41,16 @@ class Simulator:
                 self.UEs_out_of_range.append(ue)
                 print("UE %s is out of range" % ue.get_location())
             else:
-                nearest_bs = min(nearby_bs, key=lambda x: math.fabs(ue.get_location() - x.get_location()))
+                nearest_bs = min(
+                    nearby_bs,
+                    key=lambda x: math.fabs(ue.get_location() - x.get_location(
+                    )),
+                )
                 # TODO: add a minimum RSS threshold to consider
                 ue.set_eNB(nearest_bs)
                 ue.set_nearby_bs(nearby_bs)
-                print("UE %s is connected to eNB %s" % (ue.get_id(), ue.get_eNB().get_id()))
+                print("UE %s is connected to eNB %s" %
+                      (ue.get_id(), ue.get_eNB().get_id()))
 
     def discover_bs(self):
         self.e_nbs.sort(key=lambda x: x.get_location())

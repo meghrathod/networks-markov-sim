@@ -46,8 +46,9 @@ class eNB:
         """
         if self.location != ueLocation:
 
-            rss = 46 - (
-                    20 * math.log10(4 * math.pi * math.fabs(self.location - ueLocation) / self.wavelength))
+            rss = 46 - (20 * math.log10(
+                4 * math.pi * math.fabs(self.location - ueLocation) /
+                self.wavelength))
         else:
             rss = 0
 

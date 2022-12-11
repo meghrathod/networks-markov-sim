@@ -4,10 +4,8 @@ from environment import eNBs
 
 # Testing eNB class
 
-
 # Use matplotlib to plot the received power of the base station
 # as a function of distance from the base station
-
 
 x = [i for i in range(1, 50000)]
 
@@ -15,7 +13,7 @@ x = [i for i in range(1, 50000)]
 # add guidelines at increments of 5
 plt.yticks([i for i in range(-110, 0, 5)])
 for i in range(-110, 0, 5):
-    plt.axhline(y=i, color='lightgrey', linestyle='-')
+    plt.axhline(y=i, color="lightgrey", linestyle="-")
 
 
 def get_line_color(bs_type):
@@ -26,8 +24,13 @@ def get_line_color(bs_type):
 
 
 for e in eNBs:
-    plt.plot(x, [e.calc_RSS(a) for a in x], label=e.get_type() + str(e.get_id()), markersize=1,
-             color=get_line_color(e.get_type()))
+    plt.plot(
+        x,
+        [e.calc_RSS(a) for a in x],
+        label=e.get_type() + str(e.get_id()),
+        markersize=1,
+        color=get_line_color(e.get_type()),
+    )
 
 # Set a min limit of -80 on
 plt.ylim(-100, -30)
