@@ -66,4 +66,4 @@ class UE:
         return bs.calc_received_power(self.x, environment.FREQ)
 
     def detect_HO(self):
-        pass
+        raise NotImplementedError()
