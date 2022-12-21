@@ -1,67 +1,136 @@
+import math
 import random
+from math import fabs
+from typing import List
 
-import environment
+from eNB import eNB
+from utils import Ticker
 
 
 class UE:
     """Defines user entity in the environment"""
-
-    velocity = environment.VELOCITY
     direction = 1  # 0 - Towards 0, 1 - Away from
     nearby_bs = []
     HO_success = 0
     HO_failure = 0
     associated_eNB = None
+    upcoming_eNB = None
 
-    def __init__(self, x):
-        self.x = x
+    def __init__(self, x, pause=100):
+        self.velocity = 0
+        self.time_at_destination = 0
+        self.location = x
         self.id = random.randint(0, 1000)
+        self.pause_time = pause
+        self.destination = x
+        self.destinations = []
 
     def set_eNB(self, associated_eNB):
         self.associated_eNB = associated_eNB
 
-    def get_eNB(self):
+    def get_eNB(self) -> eNB:
         return self.associated_eNB
+
+    def get_upcoming_eNB(self) -> eNB:
+        return self.upcoming_eNB
+
+    def set_upcoming_eNB(self, upcoming_eNB):
+        self.upcoming_eNB = upcoming_eNB
 
     def get_id(self):
         return self.id
 
     def get_location(self):
-        return self.x
+        return self.location
 
     def set_location(self, x):
-        self.x = x
+        self.location = x
 
-    def set_nearby_bs(self, nearby_bs):
+    def set_nearby_bs(self, nearby_bs: List[eNB]):
         self.nearby_bs = nearby_bs
+
+    def get_nearby_bs(self):
+        return self.nearby_bs
 
     def set_direction(self, direction):
         self.direction = direction
+
+    def set_HO_success(self):
+        self.HO_success += 1
+
+    def set_HO_failure(self):
+        self.HO_failure += 1
 
     def set_velocity(self, velocity):
         self.velocity = velocity
 
     def __str__(self):
-        return "UE located at %s" % self.x
+        return "UE located at %s" % self.location
 
-    def move(self):  # Move the UE in the environment per millisecond
-        if self.direction == 0:
-            self.x = self.x + self.velocity / 1000
+    def move(self, ticker):  # Move the UE in the environment per millisecond(default)
+        self.location += self.direction * self.velocity * ticker.ticker_duration
+        ticker.tick()
+
+    def find_closest_bs(self):
+        return min(
+            self.nearby_bs,
+            key=lambda bs: math.fabs(self.get_location() - bs.get_location())
+        )
+
+    # def generate_random_motion(self, constant=None):
+    #     if constant is None:
+    #         self.set_velocity(random.randint(0, 100))
+    #         self.set_direction(random.randint(-1, 1))
+    #         self.move()
+    #     if constant == "v":
+    #         self.set_direction(random.randint(-1, 1))
+    #         self.move()
+    #     if constant == "d":
+    #         self.set_velocity(random.randint(-1, 100))
+    #         self.move()
+    #     if constant == "vd":
+    #         self.move()
+
+    def get_min_max_bounds(self):
+        """
+        This function returns the minimum and maximum bounds on the destination selection for waypoint mobility
+        """
+        if self.location < 1000:
+            min_bound = 0
+            max_bound = self.location + 1000
+        elif self.location > 49000:
+            max_bound = 50000
+            min_bound = self.location - 1000
         else:
-            self.x = self.x - self.velocity / 1000
+            min_bound = self.location - 1000
+            max_bound = self.location + 1000
 
-    def generate_random_motion(self, constant):
-        if constant == "v":
-            self.set_direction(random.randint(0, 1))
-            self.move()
-        if constant == "d":
-            self.set_velocity(random.randint(0, 100))
-            self.move()
-        if constant == "vd":
-            self.move()
+        # print(self.location)
+        #
+        # print("Min bound: %s" % min_bound)
+        # print("Max bound: %s" % max_bound)
 
-    def getRSSI(self, bs):
-        return bs.calc_received_power(self.x, environment.FREQ)
+        return min_bound, max_bound
 
-    def detect_HO(self):
-        raise NotImplementedError()
+    def update_UE_location(self, ticker: Ticker):
+        """
+        This function is responsible for random motion of the UE using the random waypoint model
+        """
+        # If it is time for the UE to start moving to the next destination, choose a new destination
+        if (fabs(self.location) >= fabs(self.destination) and self.direction == 1) or \
+                (fabs(self.location) <= fabs(self.destination) and self.direction == -1):
+            # Choose a new destination between 0 and 50000 meters
+            self.destination = random.uniform((self.get_min_max_bounds()[0]), self.get_min_max_bounds()[1])
+            # Set the time at which the UE will start moving to the next destination
+            self.pause_time = random.randint(10, 100)
+            ticker.time = ticker.time + self.pause_time
+            # Choose a new random speed between 10 and 50 meters per second (m/s) equivalent to 0.01 and 0.05 m/ms
+            self.velocity = random.uniform(0.1, 0.5)
+            # Choose a new direction of movement based on the relative positions of the current location and the
+            # destination
+            if self.destination > self.location:
+                self.direction = 1  # Move forwards
+            else:
+                self.direction = -1  # Move backwards
+        # Update the UE's location based on its speed, direction, and the elapsed time
+        self.move(ticker)

@@ -2,6 +2,7 @@ import math
 import random
 
 import environment
+import utils
 from utils import freq_to_wavelength
 
 
@@ -35,18 +36,20 @@ class eNB:
     def set_location(self, x):
         self.location = x
 
-    def calc_RSS(self, ueLocation):
+    def calc_RSRP(self, ueLocation):
         """
         This function calculates the Received Signal Strength of the base station in dB
         This value is calculated using the Friis equation, i.e. RSS = Ptx - Gtx - Grx - L
         :param ueLocation: Location of the UE
-        :return: RSS in dB
+        :return: RSRP(Reference Signal Received Power ) in dBm
 
-        Here it is assumed that Gtx = Grx = 0 dB
+        Here it is assumed that Gtx = Grx = 0 dB (Gains of the transmitter and receiver)
         """
-        if self.location != ueLocation:
 
-            rss = 46 - (20 * math.log10(
+        pt = utils.calc_power_in_dbm(environment.PTX)
+
+        if self.location != ueLocation:
+            rss = pt - (20 * math.log10(
                 4 * math.pi * math.fabs(self.location - ueLocation) /
                 self.wavelength))
         else:

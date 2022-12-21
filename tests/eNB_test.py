@@ -26,15 +26,14 @@ def get_line_color(bs_type):
 for e in eNBs:
     plt.plot(
         x,
-        [e.calc_RSS(a) for a in x],
+        [e.calc_RSRP(a) for a in x],
         label=e.get_type() + str(e.get_id()),
         markersize=1,
         color=get_line_color(e.get_type()),
     )
 
-# Set a min limit of -80 on
-plt.ylim(-100, -30)
+plt.ylim(-120, -60)
 plt.xlabel("Distance from eNB(units not yet defined)")
-plt.ylabel("Estimated RSS (dB)")
+plt.ylabel("Estimated RSRP (dBm)")
 plt.legend()
 plt.show()
