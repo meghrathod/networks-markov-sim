@@ -2,8 +2,8 @@ import math
 from typing import List
 
 import environment
-from UE import UE
 from eNB import eNB
+from UE import UE
 from utils import Ticker
 
 
@@ -53,13 +53,16 @@ class Simulate_UE:
                 self.check_handover_completion(ue)
             ue.update_UE_location(self.Ticker)
             self.check_for_handover(ue)
-        print("Successful HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" % ue.get_HO_success())
-        print("Failed HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" % ue.get_HO_failure())
+        print("Successful HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" %
+              ue.get_HO_success())
+        print("Failed HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" %
+              ue.get_HO_failure())
 
     def check_handover_completion(self, ue: UE):
         if self.Ticker.time - self.ho_trigger_time >= environment.TTT:
-            if ue.get_upcoming_eNB().calc_RSRP(ue.get_location()) >= \
-                    ue.get_eNB().calc_RSRP(ue.get_location() + environment.HYSTERESIS):
+            if ue.get_upcoming_eNB().calc_RSRP(
+                    ue.get_location()) >= ue.get_eNB().calc_RSRP(
+                        ue.get_location() + environment.HYSTERESIS):
                 self.ho_active = False
                 ue.set_eNB(ue.get_upcoming_eNB())
                 ue.set_HO_success(ue.get_handover_type())
