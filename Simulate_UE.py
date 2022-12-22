@@ -2,8 +2,8 @@ import math
 from typing import List
 
 import environment
-from UE import UE
 from eNB import eNB
+from UE import UE
 from utils import Ticker
 
 
@@ -39,16 +39,13 @@ class Simulate_UE:
         if len(nearby_bs) == 0:
             print("UE %s is out of range" % ue.get_location())
             return Exception("UE is out of range")
-        else:
-            sorted_nearby_bs = sorted(
-                nearby_bs,
-                key=lambda x: math.fabs(ue.get_location() - x.get_location()),
-            )
-            # TODO: add a minimum RSRP threshold to consider
-            ue.set_eNB(sorted_nearby_bs[0])
-            ue.set_nearby_bs(nearby_bs)
-            # print("UE %s is connected to eNB %s" %
-            #       (ue.get_id(), ue.get_eNB().get_id()))
+        sorted_nearby_bs = sorted(
+            nearby_bs,
+            key=lambda x: math.fabs(ue.get_location() - x.get_location()),
+        )
+        # TODO: add a minimum RSRP threshold to consider
+        ue.set_eNB(sorted_nearby_bs[0])
+        ue.set_nearby_bs(nearby_bs)
 
     def trigger_motion(self, ue: UE, time=1000000):
         while self.Ticker.time < time:
@@ -56,13 +53,16 @@ class Simulate_UE:
                 self.check_handover_completion(ue)
             ue.update_UE_location(self.Ticker)
             self.check_for_handover(ue)
-        print("Successful HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" % ue.get_HO_success())
-        print("Failed HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" % ue.get_HO_failure())
+        print("Successful HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" %
+              ue.get_HO_success())
+        print("Failed HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" %
+              ue.get_HO_failure())
 
     def check_handover_completion(self, ue: UE):
         if self.Ticker.time - self.ho_trigger_time >= environment.TTT:
-            if ue.get_upcoming_eNB().calc_RSRP(ue.get_location()) >= \
-                    ue.get_eNB().calc_RSRP(ue.get_location() + environment.HYSTERESIS):
+            if ue.get_upcoming_eNB().calc_RSRP(
+                    ue.get_location()) >= ue.get_eNB().calc_RSRP(
+                        ue.get_location() + environment.HYSTERESIS):
                 self.ho_active = False
                 ue.set_eNB(ue.get_upcoming_eNB())
                 ue.set_HO_success(ue.get_handover_type())

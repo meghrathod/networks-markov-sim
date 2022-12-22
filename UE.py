@@ -9,6 +9,7 @@ from utils import Ticker
 
 class UE:
     """Defines user entity in the environment"""
+
     direction = 1  # 0 - Towards 0, 1 - Away from
     nearby_bs = []
     HO_success = [0, 0, 0, 0]
@@ -87,14 +88,16 @@ class UE:
     def __str__(self):
         return "UE located at %s" % self.location
 
-    def move(self, ticker):  # Move the UE in the environment per millisecond(default)
+    def move(
+            self,
+            ticker):  # Move the UE in the environment per millisecond(default)
         self.location += self.direction * self.velocity * ticker.ticker_duration
         ticker.tick()
 
     def find_closest_bs(self):
         return min(
             self.nearby_bs,
-            key=lambda bs: math.fabs(self.get_location() - bs.get_location())
+            key=lambda bs: math.fabs(self.get_location() - bs.get_location()),
         )
 
     # def generate_random_motion(self, constant=None):
@@ -133,13 +136,17 @@ class UE:
         return min_bound, max_bound
 
     def get_handover_type(self):
-        if self.get_upcoming_eNB().get_type() == "lte" and self.get_eNB().get_type() == "lte":
+        if (self.get_upcoming_eNB().get_type() == "lte"
+                and self.get_eNB().get_type() == "lte"):
             return 0
-        elif self.get_upcoming_eNB().get_type() == "lte" and self.get_eNB().get_type() == "nr":
+        if (self.get_upcoming_eNB().get_type() == "lte"
+                and self.get_eNB().get_type() == "nr"):
             return 1
-        elif self.get_upcoming_eNB().get_type() == "nr" and self.get_eNB().get_type() == "lte":
+        if (self.get_upcoming_eNB().get_type() == "nr"
+                and self.get_eNB().get_type() == "lte"):
             return 2
-        elif self.get_upcoming_eNB().get_type() == "nr" and self.get_eNB().get_type() == "nr":
+        if (self.get_upcoming_eNB().get_type() == "nr"
+                and self.get_eNB().get_type() == "nr"):
             return 3
 
     def update_UE_location(self, ticker: Ticker):
@@ -147,10 +154,12 @@ class UE:
         This function is responsible for random motion of the UE using the random waypoint model
         """
         # If it is time for the UE to start moving to the next destination, choose a new destination
-        if (fabs(self.location) >= fabs(self.destination) and self.direction == 1) or \
-                (fabs(self.location) <= fabs(self.destination) and self.direction == -1):
+        if (fabs(self.location) >= fabs(self.destination) and self.direction
+                == 1) or (fabs(self.location) <= fabs(self.destination)
+                          and self.direction == -1):
             # Choose a new destination between 0 and 50000 meters
-            self.destination = random.uniform((self.get_min_max_bounds()[0]), self.get_min_max_bounds()[1])
+            self.destination = random.uniform((self.get_min_max_bounds()[0]),
+                                              self.get_min_max_bounds()[1])
             # Set the time at which the UE will start moving to the next destination
             self.pause_time = random.randint(10, 100)
             ticker.time = ticker.time + self.pause_time
