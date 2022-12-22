@@ -39,16 +39,13 @@ class Simulate_UE:
         if len(nearby_bs) == 0:
             print("UE %s is out of range" % ue.get_location())
             return Exception("UE is out of range")
-        else:
-            sorted_nearby_bs = sorted(
-                nearby_bs,
-                key=lambda x: math.fabs(ue.get_location() - x.get_location()),
-            )
-            # TODO: add a minimum RSRP threshold to consider
-            ue.set_eNB(sorted_nearby_bs[0])
-            ue.set_nearby_bs(nearby_bs)
-            # print("UE %s is connected to eNB %s" %
-            #       (ue.get_id(), ue.get_eNB().get_id()))
+        sorted_nearby_bs = sorted(
+            nearby_bs,
+            key=lambda x: math.fabs(ue.get_location() - x.get_location()),
+        )
+        # TODO: add a minimum RSRP threshold to consider
+        ue.set_eNB(sorted_nearby_bs[0])
+        ue.set_nearby_bs(nearby_bs)
 
     def trigger_motion(self, ue: UE, time=1000000):
         while self.Ticker.time < time:

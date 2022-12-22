@@ -135,11 +135,11 @@ class UE:
     def get_handover_type(self):
         if self.get_upcoming_eNB().get_type() == "lte" and self.get_eNB().get_type() == "lte":
             return 0
-        elif self.get_upcoming_eNB().get_type() == "lte" and self.get_eNB().get_type() == "nr":
+        if self.get_upcoming_eNB().get_type() == "lte" and self.get_eNB().get_type() == "nr":
             return 1
-        elif self.get_upcoming_eNB().get_type() == "nr" and self.get_eNB().get_type() == "lte":
+        if self.get_upcoming_eNB().get_type() == "nr" and self.get_eNB().get_type() == "lte":
             return 2
-        elif self.get_upcoming_eNB().get_type() == "nr" and self.get_eNB().get_type() == "nr":
+        if self.get_upcoming_eNB().get_type() == "nr" and self.get_eNB().get_type() == "nr":
             return 3
 
     def update_UE_location(self, ticker: Ticker):
