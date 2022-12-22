@@ -2,7 +2,6 @@ from eNB import eNB
 from utils import gigahertz_to_megahertz
 
 # DEFINE constants for the environment
-VELOCITY = 30000  # m/ms
 FREQ_NR = gigahertz_to_megahertz(25)  # MHz
 FREQ_LTE = gigahertz_to_megahertz(2.5)  # MHz
 TTT = 10  # ms
