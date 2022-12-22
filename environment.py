@@ -5,7 +5,7 @@ from utils import gigahertz_to_megahertz
 VELOCITY = 30000  # m/ms
 FREQ_NR = gigahertz_to_megahertz(25)  # MHz
 FREQ_LTE = gigahertz_to_megahertz(2.5)  # MHz
-TTT = 5000  # ms
+TTT = 10  # ms
 HYSTERESIS = 10  # dB
 PTX = 10  # mW
 TICKER_INTERVAL = 10  # ms

@@ -1,9 +1,9 @@
-import math
 import random
 
+import numpy
+
 import environment
-import utils
-from utils import freq_to_wavelength
+from utils import freq_to_wavelength, calc_power_in_dbm
 
 
 class eNB:
@@ -46,11 +46,11 @@ class eNB:
         Here it is assumed that Gtx = Grx = 0 dB (Gains of the transmitter and receiver)
         """
 
-        pt = utils.calc_power_in_dbm(environment.PTX)
+        pt = calc_power_in_dbm(environment.PTX)
 
         if self.location != ueLocation:
-            rss = pt - (20 * math.log10(
-                4 * math.pi * math.fabs(self.location - ueLocation) /
+            rss = pt - (20 * numpy.log10(
+                4 * numpy.pi * numpy.fabs(self.location - ueLocation) /
                 self.wavelength))
         else:
             rss = 0

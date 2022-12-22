@@ -11,8 +11,8 @@ class UE:
     """Defines user entity in the environment"""
     direction = 1  # 0 - Towards 0, 1 - Away from
     nearby_bs = []
-    HO_success = 0
-    HO_failure = 0
+    HO_success = [0, 0, 0, 0]
+    HO_failure = [0, 0, 0, 0]
     associated_eNB = None
     upcoming_eNB = None
 
@@ -55,11 +55,31 @@ class UE:
     def set_direction(self, direction):
         self.direction = direction
 
-    def set_HO_success(self):
-        self.HO_success += 1
+    def set_HO_success(self, type_ho):
+        if type_ho == 0:
+            self.HO_success[0] += 1
+        elif type_ho == 1:
+            self.HO_success[1] += 1
+        elif type_ho == 2:
+            self.HO_success[2] += 1
+        elif type_ho == 3:
+            self.HO_success[3] += 1
 
-    def set_HO_failure(self):
-        self.HO_failure += 1
+    def get_HO_success(self):
+        return self.HO_success
+
+    def get_HO_failure(self):
+        return self.HO_failure
+
+    def set_HO_failure(self, type_ho):
+        if type_ho == 0:
+            self.HO_failure[0] += 1
+        elif type_ho == 1:
+            self.HO_failure[1] += 1
+        elif type_ho == 2:
+            self.HO_failure[2] += 1
+        elif type_ho == 3:
+            self.HO_failure[3] += 1
 
     def set_velocity(self, velocity):
         self.velocity = velocity
@@ -111,6 +131,16 @@ class UE:
         # print("Max bound: %s" % max_bound)
 
         return min_bound, max_bound
+
+    def get_handover_type(self):
+        if self.get_upcoming_eNB().get_type() == "lte" and self.get_eNB().get_type() == "lte":
+            return 0
+        elif self.get_upcoming_eNB().get_type() == "lte" and self.get_eNB().get_type() == "nr":
+            return 1
+        elif self.get_upcoming_eNB().get_type() == "nr" and self.get_eNB().get_type() == "lte":
+            return 2
+        elif self.get_upcoming_eNB().get_type() == "nr" and self.get_eNB().get_type() == "nr":
+            return 3
 
     def update_UE_location(self, ticker: Ticker):
         """

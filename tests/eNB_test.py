@@ -33,7 +33,7 @@ for e in eNBs:
     )
 
 plt.ylim(-120, -60)
-plt.xlabel("Distance from eNB(units not yet defined)")
+plt.xlabel("Distance from eNB(meters)")
 plt.ylabel("Estimated RSRP (dBm)")
 plt.legend()
 plt.show()
