@@ -4,7 +4,7 @@ from math import fabs
 from typing import List
 
 from eNB import eNB
-from utils import Ticker
+from utils.Ticker import Ticker
 
 
 class UE:
@@ -12,6 +12,7 @@ class UE:
 
     direction = 1  # 0 - Towards 0, 1 - Away from
     nearby_bs = []
+    HO_total = 0
     HO_success = [0, 0, 0, 0]
     HO_failure = [0, 0, 0, 0]
     associated_eNB = None
@@ -57,6 +58,7 @@ class UE:
         self.direction = direction
 
     def set_HO_success(self, type_ho):
+        self.HO_total += 1
         if type_ho == 0:
             self.HO_success[0] += 1
         elif type_ho == 1:
@@ -72,7 +74,11 @@ class UE:
     def get_HO_failure(self):
         return self.HO_failure
 
+    def get_HO_total(self):
+        return self.HO_total
+
     def set_HO_failure(self, type_ho):
+        self.HO_total += 1
         if type_ho == 0:
             self.HO_failure[0] += 1
         elif type_ho == 1:
@@ -155,8 +161,8 @@ class UE:
         """
         # If it is time for the UE to start moving to the next destination, choose a new destination
         if (fabs(self.location) >= fabs(self.destination) and self.direction
-                == 1) or (fabs(self.location) <= fabs(self.destination)
-                          and self.direction == -1):
+            == 1) or (fabs(self.location) <= fabs(self.destination)
+                      and self.direction == -1):
             # Choose a new destination between 0 and 50000 meters
             self.destination = random.uniform((self.get_min_max_bounds()[0]),
                                               self.get_min_max_bounds()[1])

@@ -2,9 +2,10 @@ import math
 from typing import List
 
 import environment
-from eNB import eNB
 from UE import UE
-from utils import Ticker
+from eNB import eNB
+from utils.Result import Result
+from utils.Ticker import Ticker
 
 
 class Simulate_UE:
@@ -17,10 +18,12 @@ class Simulate_UE:
         self.ho_active = False
         self.ho_trigger_time = -1
 
-    def run(self, time=10000):
+    def run(self, t: Ticker, time=10000):
+        self.Ticker = t
         self.discover_bs()
         self.associate_ue_with_bs(self.ue)
-        self.trigger_motion(self.ue, time)
+        result = self.trigger_motion(self.ue, time)
+        return Result(result[0], result[1])
 
     def search_for_bs(self, ue: UE):
         nearby_bs = []
@@ -41,8 +44,7 @@ class Simulate_UE:
             return Exception("UE is out of range")
         sorted_nearby_bs = sorted(
             nearby_bs,
-            key=lambda x: math.fabs(ue.get_location() - x.get_location()),
-        )
+            key=lambda x: x.calc_RSRP(ue.get_location()))
         # TODO: add a minimum RSRP threshold to consider
         ue.set_eNB(sorted_nearby_bs[0])
         ue.set_nearby_bs(nearby_bs)
@@ -57,12 +59,13 @@ class Simulate_UE:
               ue.get_HO_success())
         print("Failed HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" %
               ue.get_HO_failure())
+        return [ue.get_HO_success(), ue.get_HO_failure()]
 
     def check_handover_completion(self, ue: UE):
         if self.Ticker.time - self.ho_trigger_time >= environment.TTT:
             if ue.get_upcoming_eNB().calc_RSRP(
                     ue.get_location()) >= ue.get_eNB().calc_RSRP(
-                        ue.get_location() + environment.HYSTERESIS):
+                ue.get_location() + environment.HYSTERESIS + environment.A3_OFFSET):
                 self.ho_active = False
                 ue.set_eNB(ue.get_upcoming_eNB())
                 ue.set_HO_success(ue.get_handover_type())

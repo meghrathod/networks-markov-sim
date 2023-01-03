@@ -1,5 +1,5 @@
 import UE
-from utils import Ticker
+from utils.Ticker import Ticker
 
 t = Ticker()
 ue = UE.UE(0)

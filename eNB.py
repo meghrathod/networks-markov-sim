@@ -3,7 +3,8 @@ import random
 import numpy
 
 import environment
-from utils import freq_to_wavelength, calc_power_in_dbm
+import utils
+import utils.misc
 
 
 class eNB:
@@ -17,9 +18,9 @@ class eNB:
         self.location = x
         self.bs_type = bs_type  # "nr" or "lte"
         if self.bs_type == "nr":
-            self.wavelength = freq_to_wavelength(environment.FREQ_NR)
+            self.wavelength = utils.misc.freq_to_wavelength(environment.FREQ_NR)
         elif self.bs_type == "lte":
-            self.wavelength = freq_to_wavelength(environment.FREQ_LTE)
+            self.wavelength = utils.misc.freq_to_wavelength(environment.FREQ_LTE)
 
     def __str__(self):
         return "eNB located at %s of type: %s" % (self.location, self.bs_type)
@@ -46,7 +47,7 @@ class eNB:
         Here it is assumed that Gtx = Grx = 0 dB (Gains of the transmitter and receiver)
         """
 
-        pt = calc_power_in_dbm(environment.PTX)
+        pt = utils.misc.calc_power_in_dbm(environment.PTX)
 
         if self.location != ueLocation:
             rss = pt - (20 * numpy.log10(
@@ -56,3 +57,16 @@ class eNB:
             rss = 0
 
         return rss
+
+
+# Environment of eNBs
+en1 = eNB(10000, "lte")
+en2 = eNB(40000, "lte")
+en3 = eNB(5000, "nr")
+en4 = eNB(15000, "nr")
+en5 = eNB(25000, "nr")
+en6 = eNB(35000, "nr")
+en7 = eNB(45000, "nr")
+en8 = eNB(25000, "nr")
+en9 = eNB(30000, "nr")
+eNBs = [en1, en2, en3, en4, en5, en6, en7, en8, en9]
