@@ -1,8 +1,8 @@
-import math
 import random
 from math import fabs
 from typing import List
 
+import environment
 from eNB import eNB
 from utils.Ticker import Ticker
 
@@ -10,21 +10,20 @@ from utils.Ticker import Ticker
 class UE:
     """Defines user entity in the environment"""
 
-    direction = 1  # 0 - Towards 0, 1 - Away from
-    nearby_bs = []
-    HO_total = 0
-    HO_success = [0, 0, 0, 0]
-    HO_failure = [0, 0, 0, 0]
-    associated_eNB = None
-    upcoming_eNB = None
-
     def __init__(self, x, pause=100):
+        self.direction = 1  # 0 - Towards 0, 1 - Away from
+        self.nearby_bs = []
+        self.HO_total = 0
+        self.HO_success = [0, 0, 0, 0]
+        self.HO_failure = [0, 0, 0, 0]
+        self.associated_eNB = None
+        self.upcoming_eNB = None
         self.velocity = 0
         self.time_at_destination = 0
         self.location = x
         self.id = random.randint(0, 1000)
         self.pause_time = pause
-        self.destination = x
+        self.waypoint = x
         self.destinations = []
 
     def set_eNB(self, associated_eNB):
@@ -100,11 +99,11 @@ class UE:
         self.location += self.direction * self.velocity * ticker.ticker_duration
         ticker.tick()
 
-    def find_closest_bs(self):
-        return min(
-            self.nearby_bs,
-            key=lambda bs: math.fabs(self.get_location() - bs.get_location()),
-        )
+    # def find_closest_bs(self):
+    #     return min(
+    #         self.nearby_bs,
+    #         key=lambda bs: math.fabs(self.get_location() - bs.get_location()),
+    #     )
 
     # def generate_random_motion(self, constant=None):
     #     if constant is None:
@@ -134,11 +133,6 @@ class UE:
             min_bound = self.location - 1000
             max_bound = self.location + 1000
 
-        # print(self.location)
-        #
-        # print("Min bound: %s" % min_bound)
-        # print("Max bound: %s" % max_bound)
-
         return min_bound, max_bound
 
     def get_handover_type(self):
@@ -160,20 +154,19 @@ class UE:
         This function is responsible for random motion of the UE using the random waypoint model
         """
         # If it is time for the UE to start moving to the next destination, choose a new destination
-        if (fabs(self.location) >= fabs(self.destination) and self.direction
-            == 1) or (fabs(self.location) <= fabs(self.destination)
-                      and self.direction == -1):
+        if (fabs(self.location) >= fabs(self.waypoint) and self.direction == 1) or \
+                (fabs(self.location) <= fabs(self.waypoint) and self.direction == -1):
             # Choose a new destination between 0 and 50000 meters
-            self.destination = random.uniform((self.get_min_max_bounds()[0]),
-                                              self.get_min_max_bounds()[1])
+            self.waypoint = random.uniform((self.get_min_max_bounds()[0]),
+                                           self.get_min_max_bounds()[1])
             # Set the time at which the UE will start moving to the next destination
-            self.pause_time = random.randint(10, 100)
+            self.pause_time = random.randint(environment.MIN_PAUSE, environment.MAX_PAUSE)
             ticker.time = ticker.time + self.pause_time
             # Choose a new random speed between 10 and 50 meters per second (m/s) equivalent to 0.01 and 0.05 m/ms
-            self.velocity = random.uniform(0.1, 0.5)
+            self.velocity = random.uniform(environment.MIN_SPEED, environment.MAX_SPEED)
             # Choose a new direction of movement based on the relative positions of the current location and the
             # destination
-            if self.destination > self.location:
+            if self.waypoint > self.location:
                 self.direction = 1  # Move forwards
             else:
                 self.direction = -1  # Move backwards

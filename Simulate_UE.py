@@ -21,84 +21,82 @@ class Simulate_UE:
     def run(self, t: Ticker, time=10000):
         self.Ticker = t
         self.discover_bs()
-        self.associate_ue_with_bs(self.ue)
-        result = self.trigger_motion(self.ue, time)
-        return Result(result[0], result[1])
+        self.associate_ue_with_bs()
+        result = self.trigger_motion(time)
+        return Result(result[0], result[1], timeOfExecution=time)
 
-    def search_for_bs(self, ue: UE):
+    def search_for_bs(self):
         nearby_bs = []
         for e_nb in self.e_nbs:
-            dist = math.fabs(ue.get_location() - e_nb.get_location())
+            dist = math.fabs(self.ue.get_location() - e_nb.get_location())
             if dist <= 20000:
                 nearby_bs.append(e_nb)
         return nearby_bs
 
-    def associate_ue_with_bs(self, ue: UE):
+    def associate_ue_with_bs(self):
         """
         This function associates the UE with the base station, it also checks if the UE is in range of the base station,
         if it is then it keeps a record of the eNB in the list of eNBs
         """
-        nearby_bs = self.search_for_bs(ue)
+        nearby_bs = self.search_for_bs()
         if len(nearby_bs) == 0:
-            print("UE %s is out of range" % ue.get_location())
+            print("UE %s is out of range" % self.ue.get_location())
             return Exception("UE is out of range")
-        sorted_nearby_bs = sorted(
-            nearby_bs,
-            key=lambda x: x.calc_RSRP(ue.get_location()))
+        sorted_nearby_bs = sorted(nearby_bs, key=lambda x: x.calc_RSRP(self.ue.get_location()), reverse=True)
         # TODO: add a minimum RSRP threshold to consider
-        ue.set_eNB(sorted_nearby_bs[0])
-        ue.set_nearby_bs(nearby_bs)
+        # print sorted_nearby_bs with their RSRP
+        self.ue.set_eNB(sorted_nearby_bs[0])
+        self.ue.set_nearby_bs(nearby_bs)
 
-    def trigger_motion(self, ue: UE, time=1000000):
+    def trigger_motion(self, time=1000000):
         while self.Ticker.time < time:
             if self.ho_active is True:
-                self.check_handover_completion(ue)
-            ue.update_UE_location(self.Ticker)
-            self.check_for_handover(ue)
+                self.check_handover_completion()
+            self.ue.update_UE_location(self.Ticker)
+            self.check_for_handover()
         print("Successful HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" %
-              ue.get_HO_success())
+              self.ue.get_HO_success())
         print("Failed HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" %
-              ue.get_HO_failure())
-        return [ue.get_HO_success(), ue.get_HO_failure()]
+              self.ue.get_HO_failure())
+        return [self.ue.get_HO_success(), self.ue.get_HO_failure()]
 
-    def check_handover_completion(self, ue: UE):
-        if self.Ticker.time - self.ho_trigger_time >= environment.TTT:
-            if ue.get_upcoming_eNB().calc_RSRP(
-                    ue.get_location()) >= ue.get_eNB().calc_RSRP(
-                ue.get_location() + environment.HYSTERESIS + environment.A3_OFFSET):
-                self.ho_active = False
-                ue.set_eNB(ue.get_upcoming_eNB())
-                ue.set_HO_success(ue.get_handover_type())
-                # print("UE %s is connected to eNB %s" % (ue.get_id(), ue.get_eNB().get_id()))
-            else:
-                ue.set_HO_failure(ue.get_handover_type())
-                self.ho_active = False
-            ue.set_upcoming_eNB(None)
-            self.ho_trigger_time = -1
-            self.associate_ue_with_bs(ue)
-        else:
-            return
-
-    def check_for_handover(self, ue: UE):
+    def check_for_handover(self):
         """
         Handover occurs when the UE is in area of another base station with higher RSRP for TTT
         """
-        # TODO: Fix handover
-        nearby_bs = ue.get_nearby_bs()
+        nearby_bs = self.ue.get_nearby_bs()
         if len(nearby_bs) == 0:
-            ue.set_HO_failure(2)
-            print("UE %s is out of range" % ue.get_location())
+            self.ue.set_HO_failure(2)
+            print("UE %s is out of range" % self.ue.get_location())
         else:
             for e_nb in nearby_bs:
-                if e_nb.get_id() != ue.get_eNB().get_id():
-                    source_rsrp = ue.get_eNB().calc_RSRP(ue.get_location())
-                    target_rsrp = e_nb.calc_RSRP(ue.get_location())
+                if e_nb.get_id() != self.ue.get_eNB().get_id():
+                    source_rsrp = self.ue.get_eNB().calc_RSRP(self.ue.get_location())
+                    target_rsrp = e_nb.calc_RSRP(self.ue.get_location())
                     if target_rsrp > source_rsrp:
                         if self.ho_active is False:
                             self.ho_active = True
                             self.ho_trigger_time = self.Ticker.time
-                            ue.set_upcoming_eNB(e_nb)
+                            self.ue.set_upcoming_eNB(e_nb)
                             # print("UE %s is in area of eNB %s" % (ue.get_id(), e_nb.get_id()))
+
+    def check_handover_completion(self):
+        if self.Ticker.time - self.ho_trigger_time >= environment.TTT:
+            if self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location()) >= \
+                    self.ue.get_eNB().calc_RSRP(
+                        self.ue.get_location() + environment.HYSTERESIS + environment.A3_OFFSET):
+                self.ho_active = False
+                self.ue.set_HO_success(self.ue.get_handover_type())
+                self.ue.set_eNB(self.ue.get_upcoming_eNB())
+                # print("UE %s is connected to eNB %s" % (self.ue.get_id(), self.ue.get_eNB().get_id()))
+            else:
+                self.ue.set_HO_failure(self.ue.get_handover_type())
+                self.ho_active = False
+            self.ue.set_upcoming_eNB(None)
+            self.ho_trigger_time = -1
+            self.associate_ue_with_bs()
+        else:
+            return
 
     def discover_bs(self):
         self.e_nbs.sort(key=lambda x: x.get_location())

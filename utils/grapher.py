@@ -28,7 +28,7 @@ def graph_rsrp(eNBs):
         )
 
     plt.ylim(-120, -60)
-    plt.xlabel("Distance from eNB(meters)")
+    plt.xlabel("Distance from eNB")
     plt.ylabel("Estimated RSRP (dBm)")
     plt.legend()
     plt.show()

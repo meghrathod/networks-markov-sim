@@ -1,6 +1,5 @@
+import math
 import random
-
-import numpy
 
 import environment
 import utils
@@ -50,23 +49,10 @@ class eNB:
         pt = utils.misc.calc_power_in_dbm(environment.PTX)
 
         if self.location != ueLocation:
-            rss = pt - (20 * numpy.log10(
-                4 * numpy.pi * numpy.fabs(self.location - ueLocation) /
+            rsrp = pt - (20 * math.log10(
+                4 * math.pi * math.fabs(self.location - ueLocation) /
                 self.wavelength))
         else:
-            rss = 0
-
-        return rss
-
-
-# Environment of eNBs
-en1 = eNB(10000, "lte")
-en2 = eNB(40000, "lte")
-en3 = eNB(5000, "nr")
-en4 = eNB(15000, "nr")
-en5 = eNB(25000, "nr")
-en6 = eNB(35000, "nr")
-en7 = eNB(45000, "nr")
-en8 = eNB(25000, "nr")
-en9 = eNB(30000, "nr")
-eNBs = [en1, en2, en3, en4, en5, en6, en7, en8, en9]
+            rsrp = 0
+        # print("ID: %s, Location: %s, RSRP: %s" % (self.id, self.location, rsrp))
+        return rsrp
