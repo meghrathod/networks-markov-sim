@@ -1,4 +1,4 @@
-import numpy
+import math
 
 
 def freq_to_wavelength(frequency):
@@ -12,7 +12,7 @@ def calc_power_in_dbm(power):
     This function calculates the transmitted power of the base station in dBm given the value in mW
     :param power: Transmitted power in mW
     """
-    return 10 * numpy.log10(power)
+    return 10 * math.log10(power)
 
 
 def gigahertz_to_megahertz(frequency):
