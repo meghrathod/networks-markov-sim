@@ -257,3 +257,5 @@ Desktop.ini
 # Vim
 
 .idea/
+
+*.xlsx
