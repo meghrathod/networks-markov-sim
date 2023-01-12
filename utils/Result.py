@@ -5,8 +5,6 @@ import openpyxl
 
 # Import the values from the environment.py file
 from environment import (
-    TTT,
-    HYSTERESIS,
     A3_OFFSET)
 
 
@@ -32,9 +30,8 @@ class Result:
     def get_total_failure(self):
         return sum(self.failure)
 
-    def save_to_file(self, file_name: str, environment: str):
+    def save_to_file(self, file_name: str, environment: str, time_to_trigger: int, hysteresis: int):
         # Check if the file exists
-        file_name = os.path.join(os.path.dirname(__file__), file_name)
         if not os.path.exists(file_name):
             print("File does not exist, creating new file")
             # Create a new workbook and add a header row
@@ -67,8 +64,8 @@ class Result:
         # Write the TTT and HYSTERESIS to the sheet
         sheet.cell(row=next_row, column=1).value = environment
         sheet.cell(row=next_row, column=2).value = self.timeOfExecution
-        sheet.cell(row=next_row, column=3).value = TTT
-        sheet.cell(row=next_row, column=4).value = HYSTERESIS
+        sheet.cell(row=next_row, column=3).value = time_to_trigger
+        sheet.cell(row=next_row, column=4).value = hysteresis
         sheet.cell(row=next_row, column=5).value = A3_OFFSET
 
         # Write the elements of self.success to separate cells

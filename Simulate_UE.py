@@ -73,7 +73,7 @@ class Simulate_UE:
                 if e_nb.get_id() != self.ue.get_eNB().get_id():
                     source_rsrp = self.ue.get_eNB().calc_RSRP(self.ue.get_location())
                     target_rsrp = e_nb.calc_RSRP(self.ue.get_location())
-                    if target_rsrp > source_rsrp:
+                    if target_rsrp > source_rsrp + environment.HYSTERESIS:
                         if self.ho_active is False:
                             self.ho_active = True
                             self.ho_trigger_time = self.Ticker.time
@@ -84,7 +84,7 @@ class Simulate_UE:
         if self.Ticker.time - self.ho_trigger_time >= environment.TTT:
             if self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location()) >= \
                     self.ue.get_eNB().calc_RSRP(
-                        self.ue.get_location() + environment.HYSTERESIS + environment.A3_OFFSET):
+                        self.ue.get_location()) + environment.HYSTERESIS + environment.A3_OFFSET:
                 self.ho_active = False
                 self.ue.set_HO_success(self.ue.get_handover_type())
                 self.ue.set_eNB(self.ue.get_upcoming_eNB())
