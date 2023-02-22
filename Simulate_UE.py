@@ -40,7 +40,7 @@ class Simulate_UE:
         """
         nearby_bs = self.search_for_bs()
         if len(nearby_bs) == 0:
-            print("UE %s is out of range" % self.ue.get_location())
+            print(f"UE %s is out of range {self.ue.get_location()}")
             return Exception("UE is out of range")
         sorted_nearby_bs = sorted(
             nearby_bs, key=lambda x: x.calc_RSRP(self.ue.get_location()), reverse=True
@@ -57,11 +57,11 @@ class Simulate_UE:
             self.ue.update_UE_location(self.Ticker)
             self.check_for_handover()
         print(
-            "Successful HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s"
-            % self.ue.get_HO_success()
+            f"Successful HOs [lte2lte, lte2nr, nr2lte, nr2nr]: {self.ue.get_HO_success()}"
+
         )
         print(
-            "Failed HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" % self.ue.get_HO_failure()
+            f"Failed HOs [lte2lte, lte2nr, nr2lte, nr2nr]: {self.ue.get_HO_failure()}"
         )
         return [self.ue.get_HO_success(), self.ue.get_HO_failure()]
 
