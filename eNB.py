@@ -54,5 +54,4 @@ class eNB:
                 self.wavelength))
         else:
             rsrp = 0
-        # print("ID: %s, Location: %s, RSRP: %s" % (self.id, self.location, rsrp))
         return rsrp

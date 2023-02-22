@@ -78,7 +78,6 @@ class Simulate_UE:
                             self.ho_active = True
                             self.ho_trigger_time = self.Ticker.time
                             self.ue.set_upcoming_eNB(e_nb)
-                            # print("UE %s is in area of eNB %s" % (ue.get_id(), e_nb.get_id()))
 
     def check_handover_completion(self):
         if self.Ticker.time - self.ho_trigger_time >= environment.TTT:
@@ -88,7 +87,6 @@ class Simulate_UE:
                 self.ho_active = False
                 self.ue.set_HO_success(self.ue.get_handover_type())
                 self.ue.set_eNB(self.ue.get_upcoming_eNB())
-                # print("UE %s is connected to eNB %s" % (self.ue.get_id(), self.ue.get_eNB().get_id()))
             else:
                 self.ue.set_HO_failure(self.ue.get_handover_type())
                 self.ho_active = False

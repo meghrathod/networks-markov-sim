@@ -99,25 +99,7 @@ class UE:
         self.location += self.direction * self.velocity * ticker.ticker_duration
         ticker.tick()
 
-    # def find_closest_bs(self):
-    #     return min(
-    #         self.nearby_bs,
-    #         key=lambda bs: math.fabs(self.get_location() - bs.get_location()),
-    #     )
 
-    # def generate_random_motion(self, constant=None):
-    #     if constant is None:
-    #         self.set_velocity(random.randint(0, 100))
-    #         self.set_direction(random.randint(-1, 1))
-    #         self.move()
-    #     if constant == "v":
-    #         self.set_direction(random.randint(-1, 1))
-    #         self.move()
-    #     if constant == "d":
-    #         self.set_velocity(random.randint(-1, 100))
-    #         self.move()
-    #     if constant == "vd":
-    #         self.move()
 
     def get_min_max_bounds(self):
         """
