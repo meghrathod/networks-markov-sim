@@ -17,9 +17,11 @@ class eNB:
         self.location = x
         self.bs_type = bs_type  # "nr" or "lte"
         if self.bs_type == "nr":
-            self.wavelength = utils.misc.freq_to_wavelength(environment.FREQ_NR)
+            self.wavelength = utils.misc.freq_to_wavelength(
+                environment.FREQ_NR)
         elif self.bs_type == "lte":
-            self.wavelength = utils.misc.freq_to_wavelength(environment.FREQ_LTE)
+            self.wavelength = utils.misc.freq_to_wavelength(
+                environment.FREQ_LTE)
 
     def __str__(self):
         return "eNB located at %s of type: %s" % (self.location, self.bs_type)
@@ -49,10 +51,15 @@ class eNB:
         pt = utils.misc.calc_power_in_dbm(environment.PTX)
 
         if self.location != ueLocation:
-            rsrp = pt - (20 * math.log10(
-                4 * math.pi * math.fabs(self.location - ueLocation) /
-                self.wavelength))
+            rsrp = pt - (
+                20
+                * math.log10(
+                    4
+                    * math.pi
+                    * math.fabs(self.location - ueLocation)
+                    / self.wavelength
+                )
+            )
         else:
             rsrp = 0
-        # print("ID: %s, Location: %s, RSRP: %s" % (self.id, self.location, rsrp))
         return rsrp
