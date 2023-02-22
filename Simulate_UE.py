@@ -78,11 +78,13 @@ class Simulate_UE:
                 if e_nb.get_id() != self.ue.get_eNB().get_id():
                     source_rsrp = self.ue.get_eNB().calc_RSRP(self.ue.get_location())
                     target_rsrp = e_nb.calc_RSRP(self.ue.get_location())
-                    if target_rsrp > source_rsrp + environment.HYSTERESIS:
-                        if self.ho_active is False:
-                            self.ho_active = True
-                            self.ho_trigger_time = self.Ticker.time
-                            self.ue.set_upcoming_eNB(e_nb)
+                    if (
+                        target_rsrp > source_rsrp + environment.HYSTERESIS
+                        and self.ho_active is False
+                    ):
+                        self.ho_active = True
+                        self.ho_trigger_time = self.Ticker.time
+                        self.ue.set_upcoming_eNB(e_nb)
 
     def check_handover_completion(self):
         if self.Ticker.time - self.ho_trigger_time >= environment.TTT:
