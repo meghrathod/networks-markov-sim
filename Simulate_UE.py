@@ -35,7 +35,8 @@ class Simulate_UE:
 
     def associate_ue_with_bs(self):
         """
-        This function associates the UE with the base station, it also checks if the UE is in range of the base station,
+        This function associates the UE with the base station, it also checks if
+        the UE is in range of the base station,
         if it is then it keeps a record of the eNB in the list of eNBs
         """
         nearby_bs = self.search_for_bs()
@@ -57,11 +58,12 @@ class Simulate_UE:
             self.ue.update_UE_location(self.Ticker)
             self.check_for_handover()
         print(
-            f"Successful HOs [lte2lte, lte2nr, nr2lte, nr2nr]: {self.ue.get_HO_success()}"
-
+            f"Successful HOs [lte2lte, lte2nr, nr2lte, nr2nr]: \
+            {self.ue.get_HO_success()}"
         )
         print(
-            f"Failed HOs [lte2lte, lte2nr, nr2lte, nr2nr]: {self.ue.get_HO_failure()}"
+            f"Failed HOs [lte2lte, lte2nr, nr2lte, nr2nr]: \
+            {self.ue.get_HO_failure()}"
         )
         return [self.ue.get_HO_success(), self.ue.get_HO_failure()]
 
