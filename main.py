@@ -9,7 +9,9 @@ from UE import UE
 from utils.Ticker import Ticker
 
 
-def main(lock_mutex: threading.Lock, time_to_trigger: int, hysteresis: int) -> utils.Result.Result:
+def main(
+    lock_mutex: threading.Lock, time_to_trigger: int, hysteresis: int
+) -> utils.Result.Result:
     u1 = UE(random.randint(0, 50000))
     enbs = eNB_environments.eNBs_mix1
     ticker = Ticker()
@@ -19,7 +21,9 @@ def main(lock_mutex: threading.Lock, time_to_trigger: int, hysteresis: int) -> u
     try:
         file_name = "Results/results_corrected.xlsx"
         file_name = os.path.join(os.path.dirname(__file__), file_name)
-        utils.Result.Result.save_to_file(res, file_name, enbs[0], time_to_trigger, hysteresis)
+        utils.Result.Result.save_to_file(
+            res, file_name, enbs[0], time_to_trigger, hysteresis
+        )
     finally:
         lock_mutex.release()
     return res
@@ -27,9 +31,7 @@ def main(lock_mutex: threading.Lock, time_to_trigger: int, hysteresis: int) -> u
 
 # Define the number of threads to run
 def run_threads(time_to_trigger: int, hysteresis: int):
-    """
-    This function runs the main function in multiple threads
-    """
+    """This function runs the main function in multiple threads"""
     # Create a lock to synchronize access to the file
     lock = threading.Lock()
 
@@ -38,7 +40,8 @@ def run_threads(time_to_trigger: int, hysteresis: int):
     threads = []
     for i in range(num_threads):
         # Create a new UE and eNBs object for each thread
-        thread = threading.Thread(target=main, args=(lock, time_to_trigger, hysteresis))
+        thread = threading.Thread(target=main, args=(
+            lock, time_to_trigger, hysteresis))
         thread.start()
         threads.append(thread)
 
