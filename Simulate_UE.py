@@ -68,9 +68,7 @@ class Simulate_UE:
         return [self.ue.get_HO_success(), self.ue.get_HO_failure()]
 
     def check_for_handover(self):
-        """
-        Handover occurs when the UE is in area of another base station with higher RSRP for TTT
-        """
+        """Handover occurs when the UE is in area of another base station with higher RSRP for TTT"""
         nearby_bs = self.ue.get_nearby_bs()
         if len(nearby_bs) == 0:
             self.ue.set_HO_failure(2)

@@ -2,9 +2,7 @@ import environment
 
 
 class Ticker:
-    """
-    This class defines the properties of a ticker, i.e. a timer that ticks at a certain interval.
-    """
+    """This class defines the properties of a ticker, i.e. a timer that ticks at a certain interval."""
 
     def __init__(self):
         self.ticker_duration = environment.TICKER_INTERVAL

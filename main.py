@@ -27,9 +27,7 @@ def main(lock_mutex: threading.Lock, time_to_trigger: int, hysteresis: int) -> u
 
 # Define the number of threads to run
 def run_threads(time_to_trigger: int, hysteresis: int):
-    """
-    This function runs the main function in multiple threads
-    """
+    """This function runs the main function in multiple threads"""
     # Create a lock to synchronize access to the file
     lock = threading.Lock()
 

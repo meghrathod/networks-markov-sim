@@ -98,9 +98,7 @@ class UE:
         ticker.tick()
 
     def get_min_max_bounds(self):
-        """
-        This function returns the minimum and maximum bounds on the destination selection for waypoint mobility
-        """
+        """This function returns the minimum and maximum bounds on the destination selection for waypoint mobility"""
         if self.location < 1000:
             min_bound = 0
             max_bound = self.location + 1000
@@ -136,9 +134,7 @@ class UE:
             return 3
 
     def update_UE_location(self, ticker: Ticker):
-        """
-        This function is responsible for random motion of the UE using the random waypoint model
-        """
+        """This function is responsible for random motion of the UE using the random waypoint model"""
         # If it is time for the UE to start moving to the next destination, choose a new destination
         if (fabs(self.location) >= fabs(self.waypoint) and self.direction == 1) or (
             fabs(self.location) <= fabs(self.waypoint) and self.direction == -1
