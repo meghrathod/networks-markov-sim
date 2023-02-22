@@ -47,7 +47,6 @@ class eNB:
 
         Here it is assumed that Gtx = Grx = 0 dB (Gains of the transmitter and receiver)
         """
-
         pt = utils.misc.calc_power_in_dbm(environment.PTX)
 
         if self.location != ueLocation:
