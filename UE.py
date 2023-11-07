@@ -6,7 +6,6 @@ import environment
 from eNB import eNB
 from utils.Ticker import Ticker
 
-
 # random.seed(42)
 
 
@@ -96,9 +95,7 @@ class UE:
     def __str__(self):
         return "UE located at %s" % self.location
 
-    def move(
-            self,
-            ticker):  # Move the UE in the environment per millisecond(default)
+    def move(self, ticker):  # Move the UE in the environment per millisecond(default)
         self.location += self.direction * self.velocity * ticker.ticker_duration
         ticker.tick()
 
@@ -139,17 +136,25 @@ class UE:
         return min_bound, max_bound
 
     def get_handover_type(self):
-        if (self.get_upcoming_eNB().get_type() == "lte"
-                and self.get_eNB().get_type() == "lte"):
+        if (
+            self.get_upcoming_eNB().get_type() == "lte"
+            and self.get_eNB().get_type() == "lte"
+        ):
             return 0
-        if (self.get_upcoming_eNB().get_type() == "lte"
-                and self.get_eNB().get_type() == "nr"):
+        if (
+            self.get_upcoming_eNB().get_type() == "lte"
+            and self.get_eNB().get_type() == "nr"
+        ):
             return 1
-        if (self.get_upcoming_eNB().get_type() == "nr"
-                and self.get_eNB().get_type() == "lte"):
+        if (
+            self.get_upcoming_eNB().get_type() == "nr"
+            and self.get_eNB().get_type() == "lte"
+        ):
             return 2
-        if (self.get_upcoming_eNB().get_type() == "nr"
-                and self.get_eNB().get_type() == "nr"):
+        if (
+            self.get_upcoming_eNB().get_type() == "nr"
+            and self.get_eNB().get_type() == "nr"
+        ):
             return 3
 
     def update_UE_location(self, ticker: Ticker):
@@ -157,13 +162,17 @@ class UE:
         This function is responsible for random motion of the UE using the random waypoint model
         """
         # If it is time for the UE to start moving to the next destination, choose a new destination
-        if (fabs(self.location) >= fabs(self.waypoint) and self.direction == 1) or \
-                (fabs(self.location) <= fabs(self.waypoint) and self.direction == -1):
+        if (fabs(self.location) >= fabs(self.waypoint) and self.direction == 1) or (
+            fabs(self.location) <= fabs(self.waypoint) and self.direction == -1
+        ):
             # Choose a new destination between 0 and 50000 meters
-            self.waypoint = random.uniform((self.get_min_max_bounds()[0]),
-                                           self.get_min_max_bounds()[1])
+            self.waypoint = random.uniform(
+                (self.get_min_max_bounds()[0]), self.get_min_max_bounds()[1]
+            )
             # Set the time at which the UE will start moving to the next destination
-            self.pause_time = random.randint(environment.MIN_PAUSE, environment.MAX_PAUSE)
+            self.pause_time = random.randint(
+                environment.MIN_PAUSE, environment.MAX_PAUSE
+            )
             # ticker.time = ticker.time + self.pause_time
             # Choose a new random speed between 10 and 50 meters per second (m/s) equivalent to 0.01 and 0.05 m/ms
             self.velocity = random.uniform(environment.MIN_SPEED, environment.MAX_SPEED)

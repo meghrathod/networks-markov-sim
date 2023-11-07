@@ -2,8 +2,8 @@ import math
 from typing import List
 
 import environment
-from UE import UE
 from eNB import eNB
+from UE import UE
 from utils.Ticker import Ticker
 
 
@@ -51,11 +51,15 @@ class Simulate_UE:
                 success += 1
                 currentHOState = 0
                 self.ho_active = False
-            if self.ho_active is True or ((self.ho_active is False) and (self.check_for_new_handover())):
-                if self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location()) >= \
-                        self.ue.get_eNB().calc_RSRP(
-                            self.ue.get_location()) + environment.HYSTERESIS + environment.A3_OFFSET:
-
+            if self.ho_active is True or (
+                (self.ho_active is False) and (self.check_for_new_handover())
+            ):
+                if (
+                    self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location())
+                    >= self.ue.get_eNB().calc_RSRP(self.ue.get_location())
+                    + environment.HYSTERESIS
+                    + environment.A3_OFFSET
+                ):
                     pStates[currentHOState] += 1
                     currentHOState += 1
                     prevHOF = False
@@ -75,8 +79,10 @@ class Simulate_UE:
                         pStates[currentHOState] += 1
                         currentHOState += 1
 
-                if self.ue.get_eNB().calc_RSRP(
-                        self.ue.get_location()) < environment.RLF_THRESHOLD:
+                if (
+                    self.ue.get_eNB().calc_RSRP(self.ue.get_location())
+                    < environment.RLF_THRESHOLD
+                ):
                     resultRLF += 1
                     if resultRLF >= 3 and prevRLF is True:
                         rlfPStates[currentHOState] += 1
@@ -123,24 +129,32 @@ class Simulate_UE:
         if len(nearby_bs) == 0:
             print("UE %s is out of range" % self.ue.get_location())
             return Exception("UE is out of range")
-        sorted_nearby_bs = sorted(nearby_bs, key=lambda x: x.calc_RSRP(self.ue.get_location()), reverse=True)
+        sorted_nearby_bs = sorted(
+            nearby_bs, key=lambda x: x.calc_RSRP(self.ue.get_location()), reverse=True
+        )
         # TODO: add a minimum RSRP threshold to consider
         # print sorted_nearby_bs with their RSRP
         self.ue.set_eNB(sorted_nearby_bs[0])
         self.ue.set_nearby_bs(nearby_bs)
 
     def trigger_motion(self, time=1000000):
-
         while self.Ticker.time < time:
             if self.ho_active is True:
                 self.check_handover_completion()
             self.ue.update_UE_location(self.Ticker)
             self.check_for_new_handover()
-        print("Successful HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" %
-              self.ue.get_HO_success())
-        print("Failed HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" %
-              self.ue.get_HO_failure())
-        return [self.ue.get_HO_success(), self.ue.get_HO_failure(), self.throughput_aggregate / self.readings]
+        print(
+            "Successful HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s"
+            % self.ue.get_HO_success()
+        )
+        print(
+            "Failed HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" % self.ue.get_HO_failure()
+        )
+        return [
+            self.ue.get_HO_success(),
+            self.ue.get_HO_failure(),
+            self.throughput_aggregate / self.readings,
+        ]
 
     def check_for_new_handover(self):
         """
@@ -178,9 +192,12 @@ class Simulate_UE:
 
     def check_handover_completion(self):
         if self.Ticker.time - self.ho_trigger_time >= environment.TTT:
-            if self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location()) >= \
-                    self.ue.get_eNB().calc_RSRP(
-                        self.ue.get_location()) + environment.HYSTERESIS + environment.A3_OFFSET:
+            if (
+                self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location())
+                >= self.ue.get_eNB().calc_RSRP(self.ue.get_location())
+                + environment.HYSTERESIS
+                + environment.A3_OFFSET
+            ):
                 self.ho_active = False
                 self.ue.set_HO_success(self.ue.get_handover_type())
                 self.ue.set_eNB(self.ue.get_upcoming_eNB())

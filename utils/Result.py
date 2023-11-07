@@ -3,14 +3,19 @@ from typing import List
 
 import openpyxl
 
-
 # Import the values from the environment.py file
 
 
 class Result:
     total = 0
 
-    def __init__(self, success: List[int], failure: List[int], timeOfExecution: int, throughput_avg: float):
+    def __init__(
+        self,
+        success: List[int],
+        failure: List[int],
+        timeOfExecution: int,
+        throughput_avg: float,
+    ):
         self.success = success
         self.failure = failure
         self.total = sum(success) + sum(failure)
@@ -30,8 +35,15 @@ class Result:
     def get_total_failure(self):
         return sum(self.failure)
 
-    def save_to_file(self, file_name: str, environment: str, time_to_trigger: int, hysteresis: int, velocity_min: float,
-                     velocity_max: float):
+    def save_to_file(
+        self,
+        file_name: str,
+        environment: str,
+        time_to_trigger: int,
+        hysteresis: int,
+        velocity_min: float,
+        velocity_max: float,
+    ):
         # Check if the file exists
         if not os.path.exists(file_name):
             print("File does not exist, creating new file")
@@ -79,10 +91,10 @@ class Result:
             sheet.cell(row=next_row, column=i + 5 + 5).value = element
 
         # Write the total success and total failure to the sheet
-        sheet.cell(row=next_row, column=14).value = (self.get_total_failure())
-        sheet.cell(row=next_row, column=15).value = (self.get_total_success())
-        sheet.cell(row=next_row, column=16).value = (self.get_total_ho())
-        sheet.cell(row=next_row, column=17).value = (self.throughput_avg)
+        sheet.cell(row=next_row, column=14).value = self.get_total_failure()
+        sheet.cell(row=next_row, column=15).value = self.get_total_success()
+        sheet.cell(row=next_row, column=16).value = self.get_total_ho()
+        sheet.cell(row=next_row, column=17).value = self.throughput_avg
 
         # Save the workbook
         workbook.save(file_name)
