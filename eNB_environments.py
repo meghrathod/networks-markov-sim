@@ -1,16 +1,17 @@
 from eNB import eNB
 
 # Mix Environment
-en1_2 = eNB(40000, "lte")
-en1_7 = eNB(30000, "lte")
+en1_1 = eNB(40000, "lte")
+en1_2 = eNB(15000, "lte")
 en1_3 = eNB(5000, "nr")
-en1_4 = eNB(15000, "nr")
+en1_4 = eNB(35000, "nr")
 en1_5 = eNB(25000, "nr")
 en1_6 = eNB(20000, "nr")
-en1_8 = eNB(45000, "nr")
-en1_9 = eNB(10000, "nr")
-en1_10 = eNB(12000, "nr")
-eNBs_mix1 = ("NR-LTE-Mix1", [en1_2, en1_3, en1_4, en1_5, en1_6, en1_7, en1_8, en1_9, en1_10])
+en1_7 = eNB(45000, "nr")
+en1_8 = eNB(10000, "nr")
+en1_9 = eNB(12000, "nr")
+en1_10 = eNB(30000, "nr")
+eNBs_mix1 = ("NR-LTE-Mix1", [en1_1, en1_2, en1_3, en1_4, en1_5, en1_6, en1_7, en1_8, en1_9, en1_10])
 
 # LTE Environment
 en2_1 = eNB(10000, "lte")

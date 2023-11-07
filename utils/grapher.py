@@ -1,5 +1,7 @@
 from matplotlib import pyplot as plt
 
+import eNB_environments
+
 
 def graph_rsrp(eNBs):
     """This function plots the received signal strength as a
@@ -8,7 +10,7 @@ def graph_rsrp(eNBs):
 
     # Add y-axis labels at increments of 5
     # add guidelines at increments of 5
-    plt.yticks(list(range(-110, 0, 5)))
+    plt.yticks(list(range(-300, 0, 5)))
     for i in range(-110, 0, 5):
         plt.axhline(y=i, color="lightgrey", linestyle="-")
 
@@ -27,8 +29,11 @@ def graph_rsrp(eNBs):
             color=get_line_color(e.get_type()),
         )
 
-    plt.ylim(-120, -60)
+    plt.ylim(-110, 0)
     plt.xlabel("Distance from eNB")
     plt.ylabel("Estimated RSRP (dBm)")
     plt.legend()
     plt.show()
+
+
+graph_rsrp(eNB_environments.eNBs_mix1[1])
