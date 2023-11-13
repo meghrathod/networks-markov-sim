@@ -2,8 +2,8 @@ import random
 
 import eNB_environments
 from UE import UE
-from utils.Ticker import Ticker
 from utils.grapher import graph_rsrp
+from utils.Ticker import Ticker
 
 u1 = UE(random.randint(0, 50000))
 enbs = eNB_environments.eNBs_mix1
