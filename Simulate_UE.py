@@ -2,10 +2,10 @@ import math
 from typing import List
 
 import environment
-from UE import UE
 from eNB import eNB
+from UE import UE
+from utils.data_processor import createCountMatrix, createProbabilityMatrix
 from utils.Ticker import Ticker
-from utils.data_processor import createProbabilityMatrix, createCountMatrix
 
 
 class Simulate_UE:
@@ -32,7 +32,6 @@ class Simulate_UE:
         return probabilityMatrix
 
     def simulate_motion(self, time=100000, verbose=False):
-
         totalCount = 0
         prepComplete = False
         initHiCounter = 0
@@ -78,8 +77,11 @@ class Simulate_UE:
                 else:
                     if a3_counter < a3_required:
                         source = self.ue.get_eNB().calc_RSRP(self.ue.get_location())
-                        target = self.ue.get_upcoming_eNB().calc_RSRP(
-                            self.ue.get_location()) + environment.HYSTERESIS + environment.A3_OFFSET
+                        target = (
+                            self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location())
+                            + environment.HYSTERESIS
+                            + environment.A3_OFFSET
+                        )
                         if target > source:
                             a3_counter += 1
                         else:
@@ -102,9 +104,11 @@ class Simulate_UE:
                         currentState = 0
                         prepComplete = True
                         continue
-                    if self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location()) >= \
-                            self.ue.get_eNB().calc_RSRP(
-                                self.ue.get_location()) + environment.PREP_THRESHOLD:
+                    if (
+                        self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location())
+                        >= self.ue.get_eNB().calc_RSRP(self.ue.get_location())
+                        + environment.PREP_THRESHOLD
+                    ):
                         prepSuccess[currentState] += 1
                         currentState += 1
                     else:
@@ -127,9 +131,11 @@ class Simulate_UE:
                         self.ue.set_upcoming_eNB(None)
                         continue
 
-                    if self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location()) >= \
-                            self.ue.get_eNB().calc_RSRP(
-                                self.ue.get_location()) + environment.EXEC_THRESHOLD:
+                    if (
+                        self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location())
+                        >= self.ue.get_eNB().calc_RSRP(self.ue.get_location())
+                        + environment.EXEC_THRESHOLD
+                    ):
                         execSuccess[currentState] += 1
                         currentState += 1
                     else:
@@ -151,10 +157,20 @@ class Simulate_UE:
             print("Total Handover Termination at each execution state:", execFailure)
             print("Total Radio Link Failures:", self.totalRLF)
             print("Total Radio Link Failures at each state:", RLF)
-            print("Total Radio Link Failures at each state when in normal state:", RLF_at_NORM)
+            print(
+                "Total Radio Link Failures at each state when in normal state:",
+                RLF_at_NORM,
+            )
 
-        countMatrix = createCountMatrix(initHiCounter, prepSuccess, prepFailure, execSuccess, execFailure,
-                                        RLF_at_NORM, RLF)
+        countMatrix = createCountMatrix(
+            initHiCounter,
+            prepSuccess,
+            prepFailure,
+            execSuccess,
+            execFailure,
+            RLF_at_NORM,
+            RLF,
+        )
         probabilityMatrix = createProbabilityMatrix(countMatrix)
 
         return probabilityMatrix
@@ -176,7 +192,9 @@ class Simulate_UE:
         if len(nearby_bs) == 0:
             print("UE %s is out of range" % self.ue.get_location())
             return Exception("UE is out of range")
-        sorted_nearby_bs = sorted(nearby_bs, key=lambda x: x.calc_RSRP(self.ue.get_location()), reverse=True)
+        sorted_nearby_bs = sorted(
+            nearby_bs, key=lambda x: x.calc_RSRP(self.ue.get_location()), reverse=True
+        )
         # TODO: add a minimum RSRP threshold to consider
         # print sorted_nearby_bs with their RSRP
         self.ue.set_eNB(sorted_nearby_bs[0])

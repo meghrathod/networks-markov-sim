@@ -3,8 +3,8 @@ import pandas as pd
 import eNB_environments
 from Simulate_UE import Simulate_UE
 from UE import UE
+from utils.data_processor import averageProbabilityMatrix, createProbabilitySumMatrix
 from utils.Ticker import Ticker
-from utils.data_processor import createProbabilitySumMatrix, averageProbabilityMatrix
 
 enbs = eNB_environments.eNBs_mix1
 
@@ -25,9 +25,23 @@ averageMatrix = averageProbabilityMatrix(probabilitySumMatrix, iterations)
 
 df = pd.DataFrame(averageMatrix)
 #  save to xlsx file
-filepath = '/Users/meghrathod/code/research/nr-simulator/Results/results_new.xlsx'
+filepath = "/Users/meghrathod/code/research/nr-simulator/Results/results_new.xlsx"
 # add column and row labels to the dataframe
-row_column_labels = ["N", "RL", "H", "A1", "A2", "A3", "A4", "A5", "B1", "B2", "B3", "B4", "B5"]
+row_column_labels = [
+    "N",
+    "RL",
+    "H",
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "A5",
+    "B1",
+    "B2",
+    "B3",
+    "B4",
+    "B5",
+]
 df.to_excel(filepath, index=True, index_label=row_column_labels)
 print(iterations)
 print(df)

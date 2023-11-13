@@ -19,7 +19,9 @@ def createProbabilityMatrix(countMatrix):
     return probabilityMatrix
 
 
-def createCountMatrix(initHiCounter, prepSuccess, prepFailure, execSuccess, execFailure, RLF_at_NORM, RLF):
+def createCountMatrix(
+    initHiCounter, prepSuccess, prepFailure, execSuccess, execFailure, RLF_at_NORM, RLF
+):
     #     14x14 grid
     countMatrix = [[0 for x in range(14)] for y in range(14)]
     for i in range(0, 5):
