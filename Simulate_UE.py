@@ -5,6 +5,7 @@ import environment
 from UE import UE
 from eNB import eNB
 from utils.Ticker import Ticker
+from utils.data_processor import createProbabilityMatrix, createCountMatrix
 
 
 class Simulate_UE:
@@ -22,14 +23,15 @@ class Simulate_UE:
         self.totalHO = 0
         self.totalRLF = 0
 
-    def run(self, t: Ticker, time=10000000):
+    def run(self, t: Ticker, time=10000000, verbose=False):
+        # Create an empty 14x14 matrix
         self.Ticker = t
         self.discover_bs()
         self.associate_ue_with_bs()
-        self.simulate_motion(time)
-        # return Result(result[0], result[1], timeOfExecution=time, throughput_avg=result[2])
+        probabilityMatrix = self.simulate_motion(time, verbose)
+        return probabilityMatrix
 
-    def simulate_motion(self, time=100000):
+    def simulate_motion(self, time=100000, verbose=False):
 
         totalCount = 0
         prepComplete = False
@@ -140,38 +142,22 @@ class Simulate_UE:
                         currentState = 0
                         continue
 
-        #     Print results
+        if verbose:
+            print("Total ticks", totalCount)
+            print("Total Handover triggers:", initHiCounter)
+            print("Total Handover transitions at each prep state:", prepSuccess)
+            print("Total Handover Termination at each prep state:", prepFailure)
+            print("Total Handover transitions at each execution state:", execSuccess)
+            print("Total Handover Termination at each execution state:", execFailure)
+            print("Total Radio Link Failures:", self.totalRLF)
+            print("Total Radio Link Failures at each state:", RLF)
+            print("Total Radio Link Failures at each state when in normal state:", RLF_at_NORM)
 
-        print("Total ticks", totalCount)
-        print("Total Handover triggers:", initHiCounter)
-        print("Total Handover transitions at each prep state:", prepSuccess)
-        print("Total Handover Termination at each prep state:", prepFailure)
-        print("Total Handover transitions at each execution state:", execSuccess)
-        print("Total Handover Termination at each execution state:", execFailure)
-        print("Total Radio Link Failures:", self.totalRLF)
-        print("Total Radio Link Failures at each state:", RLF)
-        print("Total Radio Link Failures at each state when in normal state:", RLF_at_NORM)
+        countMatrix = createCountMatrix(initHiCounter, prepSuccess, prepFailure, execSuccess, execFailure,
+                                        RLF_at_NORM, RLF)
+        probabilityMatrix = createProbabilityMatrix(countMatrix)
 
-        #     Create count matrix
-        countMatrix = self.createCountMatrix(initHiCounter, prepSuccess, prepFailure, execSuccess, execFailure,
-                                             RLF_at_NORM, RLF)
-        print("Count Matrix:")
-        for i in range(0, 14):
-            print(countMatrix[i])
-
-    def createCountMatrix(self, initHiCounter, prepSuccess, prepFailure, execSuccess, execFailure, RLF_at_NORM, RLF):
-        #     14x14 grid
-        countMatrix = [[0 for x in range(14)] for y in range(14)]
-        for i in range(0, 5):
-            countMatrix[i + 3][1] = RLF[i]
-            countMatrix[i + 3][2] = prepFailure[i + 1]
-            countMatrix[i + 9][8] = execFailure[i + 1]
-            countMatrix[i + 2][i + 3] = prepSuccess[i]
-            countMatrix[i + 8][i + 9] = execSuccess[i]
-            countMatrix[i + 9][1] = RLF[i + 5]
-        countMatrix[0][1] = RLF_at_NORM
-        countMatrix[0][2] = initHiCounter
-        return countMatrix
+        return probabilityMatrix
 
     def search_for_bs(self):
         nearby_bs = []
