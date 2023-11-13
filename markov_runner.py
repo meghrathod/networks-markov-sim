@@ -8,4 +8,4 @@ print(u1.get_location())
 enbs = eNB_environments.eNBs_mix1
 
 s = Simulate_UE(u1, enbs[1])
-s.run(Ticker(), 1000000)
+s.run(Ticker(), 5000000)

@@ -26,85 +26,152 @@ class Simulate_UE:
         self.Ticker = t
         self.discover_bs()
         self.associate_ue_with_bs()
-        self.simulate_motion_with_states(time, environment.TPREP)
+        self.simulate_motion(time)
         # return Result(result[0], result[1], timeOfExecution=time, throughput_avg=result[2])
 
-    def simulate_motion_with_states(self, time=100000, tprep=2000):
-        currentHOState = 0
-        failedHO = 0
-        prevHOF = False
-        prevRLF = False
-        resultRLF = 0
-        success = 0
+    def simulate_motion(self, time=100000):
+
         totalCount = 0
-        # create a list of states with time/200 number of states all set to zero
-        pStates = [0] * int(tprep / 200)
-        eStates = [0] * int(tprep / 200)
-        rlfPStates = [0] * int(tprep / 200)
-        rlfEStates = [0] * int(tprep / 200)
         prepComplete = False
+        initHiCounter = 0
+        handover_check = False
+        a3_counter = 0
+        currentState = 0
+        prepSuccess = [0] * int(environment.TPREP / environment.TICKER_INTERVAL)
+        prepFailure = [0] * int(environment.TPREP / environment.TICKER_INTERVAL)
+        execSuccess = [0] * int(environment.TEXEC / environment.TICKER_INTERVAL)
+        execFailure = [0] * int(environment.TEXEC / environment.TICKER_INTERVAL)
+        RLF = [0] * (int(environment.TEXEC / environment.TICKER_INTERVAL) * 2)
+        RLF_at_NORM = 0
+        a3_required = environment.TTT / environment.TICKER_INTERVAL
+        prepFailureCount = 0
+        execFailureCount = 0
 
         while self.Ticker.time < time:
-            totalCount += 1
-
-            if currentHOState == len(pStates) - 1:
-                success += 1
-                currentHOState = 0
-                self.ho_active = False
-            if self.ho_active is True or ((self.ho_active is False) and (self.check_for_new_handover())):
-                if self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location()) >= \
-                        self.ue.get_eNB().calc_RSRP(
-                            self.ue.get_location()) + environment.HYSTERESIS + environment.A3_OFFSET:
-
-                    pStates[currentHOState] += 1
-                    currentHOState += 1
-                    prevHOF = False
-
-                else:
-                    if prevHOF is False:
-                        failedHO = 0
-
-                    failedHO += 1
-                    if failedHO >= 3:
-                        failedHO = 0
-                        self.ho_active = False
-                        currentHOState = 0
-                        continue
-                    else:
-                        prevHOF = True
-                        pStates[currentHOState] += 1
-                        currentHOState += 1
-
-                if self.ue.get_eNB().calc_RSRP(
-                        self.ue.get_location()) < environment.RLF_THRESHOLD:
-                    resultRLF += 1
-                    if resultRLF >= 3 and prevRLF is True:
-                        rlfPStates[currentHOState] += 1
-                        resultRLF = 0
-                        self.totalRLF += 1
-                        self.ho_active = False
-                        self.ue.set_upcoming_eNB(None)
-                        self.associate_ue_with_bs()
-                        currentHOState = 0
-                        continue
-                    else:
-                        if prevRLF is False:
-                            resultRLF = 1
-                        prevRLF = True
-                else:
-                    prevRLF = False
-                    resultRLF = 0
-
             self.ue.update_UE_location(self.Ticker)
+            totalCount += 1  # state 0, the start
 
-        print("Total Handover triggers:", self.totalHO)
-        print("Total Handover transitions at each state:", pStates)
-        print("Probability of successful transition at state: [", end="")
-        for i in range(len(pStates)):
-            print(round(pStates[i] / self.totalHO, 3), end=",")
-        print("\b]")
+            # Check for RLF
+            source = self.ue.get_eNB().calc_RSRP(self.ue.get_location())
+            threshold = environment.RLF_THRESHOLD
+            if source < threshold:
+                self.totalRLF += 1
+                if self.ho_active is False:
+                    RLF_at_NORM += 1
+                else:
+                    if prepComplete is False:
+                        RLF[currentState] += 1
+                    else:
+                        RLF[currentState + len(prepSuccess) - 1] += 1
+                self.ue.set_upcoming_eNB(None)
+                handover_check = False
+                self.associate_ue_with_bs()
+                self.ho_active = False
+                continue
+
+            # Check for handover
+            if self.ho_active is False:
+                if handover_check is False:
+                    handover_check = self.check_for_new_handover()
+                else:
+                    if a3_counter < a3_required:
+                        source = self.ue.get_eNB().calc_RSRP(self.ue.get_location())
+                        target = self.ue.get_upcoming_eNB().calc_RSRP(
+                            self.ue.get_location()) + environment.HYSTERESIS + environment.A3_OFFSET
+                        if target > source:
+                            a3_counter += 1
+                        else:
+                            self.ue.set_upcoming_eNB(None)
+                            handover_check = False
+                            self.ho_active = False
+                            a3_counter = 0
+                            continue
+                    else:
+                        self.ho_active = True
+                        initHiCounter += 1
+                        handover_check = False
+                        self.totalHO += 1
+
+            else:
+                # Check for prep state
+
+                if prepComplete is False:
+                    if currentState == len(prepSuccess):
+                        currentState = 0
+                        prepComplete = True
+                        continue
+                    if self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location()) >= \
+                            self.ue.get_eNB().calc_RSRP(
+                                self.ue.get_location()) + environment.PREP_THRESHOLD:
+                        prepSuccess[currentState] += 1
+                        currentState += 1
+                    else:
+                        # if prepFailureCount < 3:
+                        #     prepFailureCount += 1
+                        #     continue
+                        # else:
+                        #     prepFailureCount = 0
+                        prepFailure[currentState] += 1
+                        currentState = 0
+                        continue
+                else:
+                    # Check for exec state
+
+                    if currentState == len(execSuccess):
+                        currentState = 0
+                        prepComplete = False
+                        self.ho_active = False
+                        self.ue.set_eNB(self.ue.get_upcoming_eNB())
+                        self.ue.set_upcoming_eNB(None)
+                        continue
+
+                    if self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location()) >= \
+                            self.ue.get_eNB().calc_RSRP(
+                                self.ue.get_location()) + environment.EXEC_THRESHOLD:
+                        execSuccess[currentState] += 1
+                        currentState += 1
+                    else:
+                        # if execFailureCount < 3:
+                        #     execFailureCount += 1
+                        #     continue
+                        # else:
+                        #     execFailureCount = 0
+                        execFailure[currentState] += 1
+                        currentState = 0
+                        continue
+
+        #     Print results
+
+        print("Total ticks", totalCount)
+        print("Total Handover triggers:", initHiCounter)
+        print("Total Handover transitions at each prep state:", prepSuccess)
+        print("Total Handover Termination at each prep state:", prepFailure)
+        print("Total Handover transitions at each execution state:", execSuccess)
+        print("Total Handover Termination at each execution state:", execFailure)
         print("Total Radio Link Failures:", self.totalRLF)
-        print("Total Radio Link Failures on each state:", rlfPStates)
+        print("Total Radio Link Failures at each state:", RLF)
+        print("Total Radio Link Failures at each state when in normal state:", RLF_at_NORM)
+
+        #     Create count matrix
+        countMatrix = self.createCountMatrix(initHiCounter, prepSuccess, prepFailure, execSuccess, execFailure,
+                                             RLF_at_NORM, RLF)
+        print("Count Matrix:")
+        for i in range(0, 14):
+            print(countMatrix[i])
+
+    def createCountMatrix(self, initHiCounter, prepSuccess, prepFailure, execSuccess, execFailure, RLF_at_NORM, RLF):
+        #     14x14 grid
+        countMatrix = [[0 for x in range(14)] for y in range(14)]
+        for i in range(0, 5):
+            countMatrix[i + 3][1] = RLF[i]
+            countMatrix[i + 3][2] = prepFailure[i + 1]
+            countMatrix[i + 9][8] = execFailure[i + 1]
+            countMatrix[i + 2][i + 3] = prepSuccess[i]
+            countMatrix[i + 8][i + 9] = execSuccess[i]
+            countMatrix[i + 9][1] = RLF[i + 5]
+        countMatrix[0][1] = RLF_at_NORM
+        countMatrix[0][2] = initHiCounter
+        return countMatrix
 
     def search_for_bs(self):
         nearby_bs = []
@@ -129,19 +196,6 @@ class Simulate_UE:
         self.ue.set_eNB(sorted_nearby_bs[0])
         self.ue.set_nearby_bs(nearby_bs)
 
-    def trigger_motion(self, time=1000000):
-
-        while self.Ticker.time < time:
-            if self.ho_active is True:
-                self.check_handover_completion()
-            self.ue.update_UE_location(self.Ticker)
-            self.check_for_new_handover()
-        print("Successful HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" %
-              self.ue.get_HO_success())
-        print("Failed HOs [lte2lte, lte2nr, nr2lte, nr2nr]: %s" %
-              self.ue.get_HO_failure())
-        return [self.ue.get_HO_success(), self.ue.get_HO_failure(), self.throughput_aggregate / self.readings]
-
     def check_for_new_handover(self):
         """
         Handover occurs when the UE is in area of another base station with higher RSRP for TTT
@@ -157,8 +211,6 @@ class Simulate_UE:
                     target_rsrp = e_nb.calc_RSRP(self.ue.get_location())
                     if target_rsrp > source_rsrp + environment.HYSTERESIS:
                         # if self.ho_active is False:
-                        self.totalHO += 1
-                        self.ho_active = True
                         self.ho_trigger_time = self.Ticker.time
                         self.ue.set_upcoming_eNB(e_nb)
                         return True
@@ -175,24 +227,6 @@ class Simulate_UE:
             #     throughput = 0
             # self.throughput_aggregate += throughput
             # self.throughput.append(throughput)
-
-    def check_handover_completion(self):
-        if self.Ticker.time - self.ho_trigger_time >= environment.TTT:
-            if self.ue.get_upcoming_eNB().calc_RSRP(self.ue.get_location()) >= \
-                    self.ue.get_eNB().calc_RSRP(
-                        self.ue.get_location()) + environment.HYSTERESIS + environment.A3_OFFSET:
-                self.ho_active = False
-                self.ue.set_HO_success(self.ue.get_handover_type())
-                self.ue.set_eNB(self.ue.get_upcoming_eNB())
-                # print("UE %s is connected to eNB %s" % (self.ue.get_id(), self.ue.get_eNB().get_id()))
-            else:
-                self.ue.set_HO_failure(self.ue.get_handover_type())
-                self.ho_active = False
-            self.ue.set_upcoming_eNB(None)
-            self.ho_trigger_time = -1
-            self.associate_ue_with_bs()
-        else:
-            return
 
     def discover_bs(self):
         self.e_nbs.sort(key=lambda x: x.get_location())
