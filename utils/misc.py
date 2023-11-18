@@ -29,6 +29,12 @@ def gigahertz_to_megahertz(frequency):
     return frequency
 
 
+def kmph_to_mpms(speed):
+    """This function converts speed provided in kmph to m/ms"""
+    speed = speed / 3600
+    return speed
+
+
 def calc_throughput(sinr: float, bandwidth: float) -> float:
     """
     This function calculates the throughput of the base station

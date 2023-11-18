@@ -32,7 +32,7 @@ class Simulate_UE:
         return probabilityMatrix
 
     def simulate_motion(self, time=100000, verbose=False):
-
+        success = 0
         totalCount = 0
         prepComplete = False
         initHiCounter = 0
@@ -122,6 +122,7 @@ class Simulate_UE:
                     if currentState == len(execSuccess):
                         currentState = 0
                         prepComplete = False
+                        success += 1
                         self.ho_active = False
                         self.ue.set_eNB(self.ue.get_upcoming_eNB())
                         self.ue.set_upcoming_eNB(None)
@@ -152,9 +153,10 @@ class Simulate_UE:
             print("Total Radio Link Failures:", self.totalRLF)
             print("Total Radio Link Failures at each state:", RLF)
             print("Total Radio Link Failures at each state when in normal state:", RLF_at_NORM)
+            print("Total Successful Handovers:", success)
 
         countMatrix = createCountMatrix(initHiCounter, prepSuccess, prepFailure, execSuccess, execFailure,
-                                        RLF_at_NORM, RLF)
+                                        RLF_at_NORM, RLF, success)
         probabilityMatrix = createProbabilityMatrix(countMatrix)
 
         return probabilityMatrix
