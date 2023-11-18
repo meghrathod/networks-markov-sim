@@ -20,7 +20,7 @@ def calc_power_in_mw(power):
     This function calculates the transmitted power of the base station in mW given the value in dBm
     :param power: Transmitted power in dBm
     """
-    return 10 ** (power / 10)
+    return 10**(power / 10)
 
 
 def gigahertz_to_megahertz(frequency):

@@ -19,7 +19,16 @@ def createProbabilityMatrix(countMatrix):
     return probabilityMatrix
 
 
-def createCountMatrix(initHiCounter, prepSuccess, prepFailure, execSuccess, execFailure, RLF_at_NORM, RLF, success):
+def createCountMatrix(
+    initHiCounter,
+    prepSuccess,
+    prepFailure,
+    execSuccess,
+    execFailure,
+    RLF_at_NORM,
+    RLF,
+    success,
+):
     #     11x11 grid
     countMatrix = [[0 for x in range(11)] for y in range(11)]
     for i in range(0, 4):
@@ -52,18 +61,26 @@ def averageProbabilityMatrix(matrix, count):
 
 
 def vector_calc(p):
-    alpha = p[2][2] - 1 + (p[3][2] * p[2][3]) + (p[4][2] * p[3][4] * p[2][3]) + (p[5][2] * p[4][5] * p[3][4] * p[2][3])
+    alpha = (p[2][2] - 1 + (p[3][2] * p[2][3]) +
+             (p[4][2] * p[3][4] * p[2][3]) +
+             (p[5][2] * p[4][5] * p[3][4] * p[2][3]))
     beta = 1 + p[2][3] + (p[3][4] * p[2][3]) + (p[4][5] * p[3][4] * p[2][3])
-    gamma = 1 + p[6][7] + (p[7][8] * p[6][7]) + (p[8][9] * p[7][8] * p[6][9]) + (
-            p[10][0] * p[9][10] * p[8][9] * p[7][8] * p[6][7])
+    gamma = (1 + p[6][7] + (p[7][8] * p[6][7]) +
+             (p[8][9] * p[7][8] * p[6][9]) +
+             (p[10][0] * p[9][10] * p[8][9] * p[7][8] * p[6][7]))
     lamb = p[5][6] * p[4][5] * p[3][4] * p[2][3]
-    delta = p[6][6] - 1 + (p[7][6] * p[6][9]) + (p[8][6] * p[7][8] * p[6][7]) + (p[9][6] * p[8][9] * p[7][8] * p[6][7])
+    delta = (p[6][6] - 1 + (p[7][6] * p[6][9]) +
+             (p[8][6] * p[7][8] * p[6][7]) +
+             (p[9][6] * p[8][9] * p[7][8] * p[6][7]))
 
     # Make an array of 11 values
     x = [0 for a in range(11)]
-    x[0] = (alpha * delta) / ((2 * alpha * delta) + (p[0][2] * lamb * gamma) - (delta * beta * p[0][2]))
-    x[2] = delta / ((delta * beta) - (lamb * gamma) - ((2 * alpha * delta) / p[0][2]))
-    x[6] = lamb / (((2 * alpha * delta) / p[0][2]) + (lamb * gamma) - (delta * beta))
+    x[0] = (alpha * delta) / ((2 * alpha * delta) + (p[0][2] * lamb * gamma) -
+                              (delta * beta * p[0][2]))
+    x[2] = delta / ((delta * beta) - (lamb * gamma) -
+                    ((2 * alpha * delta) / p[0][2]))
+    x[6] = lamb / (((2 * alpha * delta) / p[0][2]) + (lamb * gamma) -
+                   (delta * beta))
     x[10] = p[9][10] * p[8][9] * p[7][8] * p[6][7] * x[6]
     x[1] = x[0] - p[10][0] * x[10]
     x[3] = x[2] * p[2][3]
@@ -80,7 +97,8 @@ def extract_data(x, p):
     # Extract the data from the vector
     RLF = x[1]
     initHiCounter = x[2]
-    HOF = x[2] * p[2][1] + x[3] * p[3][1] + x[4] * p[4][1] + x[5] * p[5][1] + x[6] * p[6][1] + x[7] * p[7][1] + x[8] * \
-          p[8][1] + x[9] * p[9][1] + x[10] * p[10][1]
+    HOF = (x[2] * p[2][1] + x[3] * p[3][1] + x[4] * p[4][1] + x[5] * p[5][1] +
+           x[6] * p[6][1] + x[7] * p[7][1] + x[8] * p[8][1] + x[9] * p[9][1] +
+           x[10] * p[10][1])
 
     return RLF, initHiCounter, HOF
