@@ -64,7 +64,7 @@ class Simulate_UE:
                     if prepComplete is False:
                         RLF[currentState] += 1
                     else:
-                        RLF[currentState + len(prepSuccess) - 1] += 1
+                        RLF[currentState + len(prepSuccess) - 2] += 1
                 self.ue.set_upcoming_eNB(None)
                 handover_check = False
                 self.associate_ue_with_bs()
@@ -157,9 +157,10 @@ class Simulate_UE:
 
         countMatrix = createCountMatrix(initHiCounter, prepSuccess, prepFailure, execSuccess, execFailure,
                                         RLF_at_NORM, RLF, success)
+
         probabilityMatrix = createProbabilityMatrix(countMatrix)
 
-        return probabilityMatrix
+        return probabilityMatrix, countMatrix
 
     def search_for_bs(self):
         nearby_bs = []
