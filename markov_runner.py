@@ -5,8 +5,13 @@ import environment
 import utils.misc
 from Simulate_UE import Simulate_UE
 from UE import UE
+from utils.data_processor import (
+    averageProbabilityMatrix,
+    createProbabilitySumMatrix,
+    extract_data,
+    vector_calc,
+)
 from utils.Ticker import Ticker
-from utils.data_processor import createProbabilitySumMatrix, averageProbabilityMatrix, vector_calc, extract_data
 
 enbs = eNB_environments.eNBs_mix1
 
@@ -39,7 +44,8 @@ def simulate(iterations):
         # calculate total sum of all the values in the matrix
         for m in range(11):
             total_sum[i] += sum(count[m])
-        probabilitySumMatrix = createProbabilitySumMatrix(probabilitySumMatrix, matrix)
+        probabilitySumMatrix = createProbabilitySumMatrix(
+            probabilitySumMatrix, matrix)
         # except Exception as e:
         #     # print("Error", e)
         #     iterations -= 1
@@ -67,7 +73,15 @@ def simulate(iterations):
     return RLF, Hi, HOF, RLF_time, Hi_time, HOF_time
 
 
-data_vel = {'velocity': [], 'RLF': [], 'Hi': [], 'HOF': [], 'RLF_time': [], 'Hi_time': [], 'HOF_time': []}
+data_vel = {
+    "velocity": [],
+    "RLF": [],
+    "Hi": [],
+    "HOF": [],
+    "RLF_time": [],
+    "Hi_time": [],
+    "HOF_time": [],
+}
 df_vel = pd.DataFrame(data_vel)
 x = 0
 
@@ -82,9 +96,17 @@ for i in velocities:
 
 print(df_vel)
 
-df_vel.to_csv('vel.csv', header=True, index=False)
+df_vel.to_csv("vel.csv", header=True, index=False)
 
-data_offset = {'offset': [], 'RLF': [], 'Hi': [], 'HOF': [], 'RLF_time': [], 'Hi_time': [], 'HOF_time': []}
+data_offset = {
+    "offset": [],
+    "RLF": [],
+    "Hi": [],
+    "HOF": [],
+    "RLF_time": [],
+    "Hi_time": [],
+    "HOF_time": [],
+}
 df_offset = pd.DataFrame(data_offset)
 
 x = 0
@@ -98,9 +120,17 @@ for i in prep_offsets:
     df_offset.loc[x] = [i, a, b, c, d, e, f]
     x = x + 1
 
-df_offset.to_csv('prep_offset.csv', header=True, index=False)
+df_offset.to_csv("prep_offset.csv", header=True, index=False)
 
-data_exec_offset = {'offset': [], 'RLF': [], 'Hi': [], 'HOF': [], 'RLF_time': [], 'Hi_time': [], 'HOF_time': []}
+data_exec_offset = {
+    "offset": [],
+    "RLF": [],
+    "Hi": [],
+    "HOF": [],
+    "RLF_time": [],
+    "Hi_time": [],
+    "HOF_time": [],
+}
 df_exec_offset = pd.DataFrame(data_exec_offset)
 
 x = 0
@@ -114,7 +144,7 @@ for i in exec_offsets:
     df_exec_offset.loc[x] = [i, a, b, c, d, e, f]
     x = x + 1
 
-df_exec_offset.to_csv('exec_offset.csv', header=True, index=False)
+df_exec_offset.to_csv("exec_offset.csv", header=True, index=False)
 
 # df = pd.DataFrame(p)
 # #  save to xlsx file
