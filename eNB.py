@@ -66,7 +66,7 @@ class eNB:
 
             z = complex(x, y)
             # calculate the path loss using environment.PTX and distance between the base station and UE
-            pl = (4 * math.pi * math.fabs(self.location - ueLocation) / self.wavelength)
+            pl = 4 * math.pi * math.fabs(self.location - ueLocation) / self.wavelength
             # print("Path Loss: %s" % pl)
             # calculate the shadowing using the path loss and the complex number
             fading = pl * z

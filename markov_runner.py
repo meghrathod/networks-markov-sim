@@ -4,8 +4,13 @@ import eNB_environments
 import environment
 from Simulate_UE import Simulate_UE
 from UE import UE
+from utils.data_processor import (
+    averageProbabilityMatrix,
+    createProbabilitySumMatrix,
+    extract_data,
+    vector_calc,
+)
 from utils.Ticker import Ticker
-from utils.data_processor import createProbabilitySumMatrix, averageProbabilityMatrix, vector_calc, extract_data
 
 enbs = eNB_environments.eNBs_mix1
 
@@ -32,7 +37,9 @@ def simulate(iterations):
         s = Simulate_UE(u1, enbs[1])
 
         # try:
-        matrix, count, average_latency, success, latency_array = s.run(Ticker(), 1000000, False)
+        matrix, count, average_latency, success, latency_array = s.run(
+            Ticker(), 1000000, False
+        )
         # concat all_latencies and average_latency
         all_latencies = all_latencies + latency_array
         num_of_handovers[i] = success
@@ -115,8 +122,16 @@ def simulate(iterations):
 #
 # df_ttt.to_csv('lte_ttt.csv', header=True, index=False)
 
-data_offset = {'offset': [], 'RLF': [], 'Hi': [], 'HOF': [], 'RLF_time': [], 'Hi_time': [], 'HOF_time': [],
-               'latency': []}
+data_offset = {
+    "offset": [],
+    "RLF": [],
+    "Hi": [],
+    "HOF": [],
+    "RLF_time": [],
+    "Hi_time": [],
+    "HOF_time": [],
+    "latency": [],
+}
 df_offset = pd.DataFrame(data_offset)
 
 x = 0
@@ -132,7 +147,9 @@ for i in prep_offsets:
 
 # print(df_offset)
 
-df_offset.to_csv('markov_result/re/latency_nofad_prep_offset.csv', header=True, index=False)
+df_offset.to_csv(
+    "markov_result/re/latency_nofad_prep_offset.csv", header=True, index=False
+)
 
 # data_exec_offset = {'offset': [], 'RLF': [], 'Hi': [], 'HOF': [], 'RLF_time': [], 'Hi_time': [], 'HOF_time': [],
 #                     'latency': []}
