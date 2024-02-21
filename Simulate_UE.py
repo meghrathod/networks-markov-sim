@@ -28,10 +28,12 @@ class Simulate_UE:
         self.Ticker = t
         self.discover_bs()
         self.associate_ue_with_bs()
-        probabilityMatrix = self.simulate_motion(time, verbose)
-        return probabilityMatrix
+        probabilityMatrix, count, average, success, latency_array = self.simulate_motion(time, verbose)
+        return probabilityMatrix, count, average, success, latency_array
 
     def simulate_motion(self, time=100000, verbose=False):
+        start = self.Ticker.time
+        end = 0
         success = 0
         totalCount = 0
         prepComplete = False
@@ -48,6 +50,8 @@ class Simulate_UE:
         a3_required = environment.TTT / environment.TICKER_INTERVAL
         prepFailureCount = 0
         execFailureCount = 0
+        latency_sum = 0
+        latency_array = []
 
         while self.Ticker.time < time:
             self.ue.update_UE_location(self.Ticker)
@@ -93,6 +97,7 @@ class Simulate_UE:
                         initHiCounter += 1
                         handover_check = False
                         self.totalHO += 1
+                        start = self.Ticker.time
 
             else:
                 # Check for prep state
@@ -124,6 +129,9 @@ class Simulate_UE:
                         prepComplete = False
                         success += 1
                         self.ho_active = False
+                        end = self.Ticker.time
+                        latency_sum += end - start
+                        latency_array.append(end - start)
                         self.ue.set_eNB(self.ue.get_upcoming_eNB())
                         self.ue.set_upcoming_eNB(None)
                         continue
@@ -159,8 +167,10 @@ class Simulate_UE:
                                         RLF_at_NORM, RLF, success)
 
         probabilityMatrix = createProbabilityMatrix(countMatrix)
-
-        return probabilityMatrix, countMatrix
+        if success == 0:
+            return probabilityMatrix, countMatrix, 0, 0, []
+        else:
+            return probabilityMatrix, countMatrix, latency_sum / success, success, latency_array
 
     def search_for_bs(self):
         nearby_bs = []

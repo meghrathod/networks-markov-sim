@@ -4,12 +4,12 @@ from utils.misc import gigahertz_to_megahertz, kmph_to_mpms
 FREQ_NR = gigahertz_to_megahertz(25)  # MHz
 FREQ_LTE = gigahertz_to_megahertz(2.5)  # MHz
 TTT = 80  # ms
-HYSTERESIS = 15  # dB
+HYSTERESIS = 10  # dB
 PTX = 10  # mW
 TICKER_INTERVAL = 20  # ms
 A3_OFFSET = 0  # dB
-MIN_SPEED = kmph_to_mpms(50)
-MAX_SPEED = kmph_to_mpms(100)
+MIN_SPEED = kmph_to_mpms(15)
+MAX_SPEED = kmph_to_mpms(15)
 MIN_PAUSE = 10  # ms
 MAX_PAUSE = 100  # ms
 BANDWIDTH_NR = 100  # MHz

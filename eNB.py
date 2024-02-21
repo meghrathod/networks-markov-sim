@@ -50,14 +50,23 @@ class eNB:
 
         Here it is assumed that Gtx = Grx = 0 dB (Gains of the transmitter and receiver)
         """
+
         pt = utils.misc.calc_power_in_dbm(environment.PTX)
         if self.location != ueLocation:
             x = numpy.random.normal(0, 1)
             y = numpy.random.normal(0, 1)
             # make a complex number using the two random numbers
+
+            # N = 1
+            # K_dB = 3  # K factor in dB
+            # K = 10 ** (K_dB / 10)  # K factor in linear scale
+            # mu = math.sqrt(K / (2 * (K + 1)))  # mean
+            # sigma = math.sqrt(1 / (2 * (K + 1)))  # sigma
+            # z = (sigma * standard_normal(N) + mu) + 1j * (sigma * standard_normal(N) + mu)
+
             z = complex(x, y)
             # calculate the path loss using environment.PTX and distance between the base station and UE
-            pl = (4 * math.pi * (self.location - ueLocation) / self.wavelength)
+            pl = (4 * math.pi * math.fabs(self.location - ueLocation) / self.wavelength)
             # print("Path Loss: %s" % pl)
             # calculate the shadowing using the path loss and the complex number
             fading = pl * z
@@ -67,7 +76,7 @@ class eNB:
 
             pr = environment.PTX * fading
 
-            rsrp = pt - utils.misc.calc_power_in_dbm(pr)
+            rsrp = pt - (20 * math.log10(pl))
             # print("RSRP: %s" % rsrp)
         else:
             rsrp = 0
