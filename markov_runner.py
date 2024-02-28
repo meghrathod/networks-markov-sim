@@ -5,8 +5,13 @@ import eNB_environments
 import environment
 from Simulate_UE import Simulate_UE
 from UE import UE
+from utils.data_processor import (
+    averageProbabilityMatrix,
+    createProbabilitySumMatrix,
+    extract_data,
+    vector_calc,
+)
 from utils.Ticker import Ticker
-from utils.data_processor import createProbabilitySumMatrix, averageProbabilityMatrix, vector_calc, extract_data
 
 enbs = eNB_environments.eNBs_mix1
 
@@ -33,7 +38,9 @@ def simulate(iterations):
         s = Simulate_UE(u1, enbs[1])
 
         # try:
-        matrix, count, average_latency, success, latency_array = s.run(Ticker(), 1000000, False)
+        matrix, count, average_latency, success, latency_array = s.run(
+            Ticker(), 1000000, False
+        )
         # concat all_latencies and average_latency
         all_latencies = all_latencies + latency_array
         num_of_handovers[i] = success
@@ -84,8 +91,16 @@ def simulate(iterations):
     # return expect, num_of_handovers_average
 
 
-data_vel = {'velocity': [], 'RLF': [], 'Hi': [], 'HOF': [], 'RLF_time': [], 'Hi_time': [], 'HOF_time': [],
-            'avg_latency': []}
+data_vel = {
+    "velocity": [],
+    "RLF": [],
+    "Hi": [],
+    "HOF": [],
+    "RLF_time": [],
+    "Hi_time": [],
+    "HOF_time": [],
+    "avg_latency": [],
+}
 df_vel = pd.DataFrame(data_vel)
 x = 0
 
@@ -100,9 +115,17 @@ for i in velocities:
 
 print(df_vel)
 
-df_vel.to_csv('markov_result/packet_rate/all_latency_vel.csv', header=True, index=False)
+df_vel.to_csv("markov_result/packet_rate/all_latency_vel.csv", header=True, index=False)
 
-data_ttt = {'TTT': [], 'RLF': [], 'Hi': [], 'HOF': [], 'RLF_time': [], 'Hi_time': [], 'HOF_time': []}
+data_ttt = {
+    "TTT": [],
+    "RLF": [],
+    "Hi": [],
+    "HOF": [],
+    "RLF_time": [],
+    "Hi_time": [],
+    "HOF_time": [],
+}
 df_ttt = pd.DataFrame(data_ttt)
 x = 0
 
@@ -116,13 +139,9 @@ for i in ttt:
 
 print(df_ttt)
 
-df_ttt.to_csv('lte_ttt.csv', header=True, index=False)
+df_ttt.to_csv("lte_ttt.csv", header=True, index=False)
 
-data_offset = {'prep-offset': [],
-               'latency': [],
-               'num_of_samples': [],
-               'std_dev': []
-               }
+data_offset = {"prep-offset": [], "latency": [], "num_of_samples": [], "std_dev": []}
 
 df_offset = pd.DataFrame(data_offset)
 
@@ -141,10 +160,20 @@ for i in prep_offsets:
 
 # print(df_offset)
 
-df_offset.to_csv('markov_result/re/prep-offset-latency-std.csv', header=True, index=False)
+df_offset.to_csv(
+    "markov_result/re/prep-offset-latency-std.csv", header=True, index=False
+)
 
-data_exec_offset = {'offset': [], 'RLF': [], 'Hi': [], 'HOF': [], 'RLF_time': [], 'Hi_time': [], 'HOF_time': [],
-                    'latency': []}
+data_exec_offset = {
+    "offset": [],
+    "RLF": [],
+    "Hi": [],
+    "HOF": [],
+    "RLF_time": [],
+    "Hi_time": [],
+    "HOF_time": [],
+    "latency": [],
+}
 df_exec_offset = pd.DataFrame(data_exec_offset)
 
 x = 0
@@ -158,9 +187,11 @@ for i in exec_offsets:
     x = x + 1
 
 print(df_exec_offset)
-df_exec_offset.to_csv('markov_result/latency_nofad_exec_offset.csv', header=True, index=False)
+df_exec_offset.to_csv(
+    "markov_result/latency_nofad_exec_offset.csv", header=True, index=False
+)
 
-data_exec_offset = {'offset': [], 'expect_latency': []}
+data_exec_offset = {"offset": [], "expect_latency": []}
 df_exec_offset = pd.DataFrame(data_exec_offset)
 
 x = 0
@@ -174,7 +205,9 @@ for i in exec_offsets:
     x = x + 1
 
 print(df_exec_offset)
-df_exec_offset.to_csv('markov_result/expect_latency_exec_offset3.csv', header=True, index=False)
+df_exec_offset.to_csv(
+    "markov_result/expect_latency_exec_offset3.csv", header=True, index=False
+)
 
 # df = pd.DataFrame(p)
 # #  save to xlsx file
