@@ -1,6 +1,6 @@
 # NR Simulator
 
-> This is a simulator for analysis of Handover mechanism in a wireless system with 5G NR(New Radio) technology and 4G
+> This is a simulator for performance analysis of the Handover mechanism in a wireless system with 5G NR(New Radio) technology and 4G
 > LTE (Long Term Evolution Technology)
 
 ## Table of Contents
@@ -12,13 +12,12 @@
 
 ## Introduction
 
-This is a simulator for analysis of Handover mechanism, its success and failure rate in a wireless system with 5G NR(New
-Radio) technology and 4G LTE (Long Term Evolution Technology). The simulator is written in Python. The simulator is
+This is a simulator for analysis of the fast conditional handover using a novel Markov Model. The simulator is written in Python. The simulator is
 designed to be modular and extensible. It is possible to add new handover algorithms and new mobility models.
 
 ## Installation
 
-The simulator is written in Python and uses the following libraries:
+The simulator is written in Python and uses the following libraries governed by their respective licenses:
 
 - [numpy](https://numpy.org/)
 - [matplotlib](https://matplotlib.org/)
@@ -28,11 +27,7 @@ The simulator is written in Python and uses the following libraries:
 
 ## Usage
 
-The simulator is designed to be easy to use. The simulator is run by executing the following command:
-
-```
-python3 main.py
-```
+The simulator is designed to be easy to use. The simulator is run after configuring `markov-runner.py`.
 
 ## Environment
 
@@ -44,18 +39,12 @@ configured:
 - Time to trigger handover
 - Input power of base stations
 - Hysteresis
-
-## Handover Algorithm : A3 Based
-
-- This project has implemented a A3 based handover algorithm. This algorithm uses RSRP (Reference Signal Received Power)
-  to determine the best base station to connect to. The base station with the highest RSRP is chosen.
-- Project uses Random Waypoint Mobility Model to generate mobility of UE (User Equipment).
-- Project uses a 1D line to simulate the environment.
-- At every time tick, the UE measures the RSRP of all the base stations nearby and if the RSRP of the current base
-  station is less than the RSRP of the best base station by a hysteresis amount for a minimum time to trigger, the UE
-  will trigger a handover to the best base station.
-- The simulator will run for a specified number of time ticks and will output the number of handovers that occurred, the
-  number of successful handovers and the number of failed handovers.
+- Tprep and Texec
+- Preparation and Execution offsets
+- Velocity of user
+- Bandwidth of base stations
+- RLF Threshold
+And a few other configurable properties can be extended by modifying `Simulate_UE.py`.
 
 ## License
 
