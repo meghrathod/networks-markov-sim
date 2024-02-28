@@ -36,4 +36,4 @@ def graph_rsrp(eNBs):
     plt.show()
 
 
-graph_rsrp(eNB_environments.eNBs_lte[1])
+graph_rsrp(eNB_environments.eNBs_mix1)
